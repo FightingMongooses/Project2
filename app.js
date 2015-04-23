@@ -7,13 +7,10 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 //var mongoose = require("mongoose");
 
-
-var routes = require("./routes/index");
-var users = require("./routes/users");
-
 var app = express();
 
-// Mongodb connection and a mongodb model autoloader
+// Mongodb connection and a mongoose model autoloader
+// https://www.npmjs.com/package/mongoose.models.autoload
 global.mongoose = require("mongoose.models.autoload")(require("mongoose"), require("path").join(__dirname, "models"), true).connect("mongodb://localhost/cpsc473fightingmongooses");
 
 // view engine setup
@@ -29,8 +26,12 @@ app.use(cookieParser());
 app.use(require("less-middleware")(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "public")));
 
+
+var routes = require("./routes/index");
+var user = require("./routes/user");
+
 app.use("/", routes);
-app.use("/users", users);
+app.use("/user", user);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
