@@ -1,7 +1,9 @@
 "use strict";
 
 var user = {
-    token: null,
+    info: {
+        token: null,
+    },
     send: {
         register: function(){
             socket.emit("user:register",{email:$("div#signIn input#email").val(),password:$("div#signIn input#password").val()});
@@ -143,8 +145,8 @@ var user = {
                 $("input#displayname").parent().addClass("has-error");
             }
             if(typeof msg.token === "boolean" && msg.token === true){
-                $("li.guest").removeClass("hidden");
-                $("li.user").addClass("hidden");
+                $(".guest").removeClass("hidden");
+                $(".user").addClass("hidden");
                 localStorage.clear();
             }
         });
@@ -156,8 +158,8 @@ var user = {
             // Close modal login screens
             user.modal.signin.dialog("close");
             // Toggle nav menus
-            $("li.guest").addClass("hidden");
-            $("li.user").removeClass("hidden");
+            $(".guest").addClass("hidden");
+            $(".user").removeClass("hidden");
             $("input").parent().removeClass("has-error");
         });
         socket.on("user:accountInfo",function(msg){
