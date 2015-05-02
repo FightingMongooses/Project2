@@ -13,37 +13,52 @@ module.exports = function (io,socket) {
             decoded = null;
         }
         var thisSocket = socket.id;
-        if(decoded === null){ // Token error of some sort
+        console.log({test:decoded});
+        if(decoded === null || typeof decoded.sockets === "undefined"){ // Token error of some sort
+            socket.emit("user:signinError", {token: true}); // Run token delete command client-side
             return false;
-        } else if(decoded.socket === thisSocket){ // Sockets match, no need to verify further since token passed as valid
+        } else if(decoded.sockets.indexOf(thisSocket) > -1 ){ // Sockets match, no need to verify further since token passed as valid
+            console.log({what:decoded});
             return decoded;
-        } else if (decoded.socket !== thisSocket) { // Sockets don't match, check if token's socket still exists.
-            if(typeof io.sockets.connected[decoded.socket] === "undefined"){
-                // Token's socket is dead, token should be refreshed shortly. Consider this valid.
-                return decoded;
-            } else { // Token's socket is live, is this an intrusion attempt?
-                //Check user IP, if IPs don't match, consider intrusion
-                if(io.sockets.connected[decoded.socket].conn._remoteAddress === io.sockets.connected[thisSocket].conn._remoteAddress){
-                    // Looks like duplicate socket from same IP, consider valid.
-                    return decoded;
-                } else {
-                    // IPs don't match, invalid the newer session
+        } else { // Current socket not listed in token, verify by IP for now
+            var liveSockets = {};
+            // Check if all listed sockets are dead, if they are, consider this socket live. Token should be updated soon enough
+            _.forEach(decoded.sockets,function(k,v){ // Grab all the IP addresses for live sockets
+                if(typeof io.sockets.connected[v] !== "undefined") {
+                    liveSockets[v] = io.sockets.connected[v].conn._remoteAddress;
+                } else { // Socket is dead, pull from decoded object incase token is regenerated later
+                    _.pull(decoded.sockets,v);
+                }
+            });
+            if(Object.keys(liveSockets).length > 0){ // If any of the existing listed sockets are live, compare their IPs
+                if (liveSockets.indexOf(io.sockets.connected[thisSocket].conn._remoteAddress) > -1){
+                    console.log({what:decoded});
+                    return decoded; // IP address was found in list
+                } else { // IP not found in active list, kill new user socket
                     socket.emit("user:signinError", {token: true}); // Run token delete command client-side
                     return false;
                 }
+            } else { // No living sockets, consider valid token
+                console.log({what:decoded});
+                return decoded;
             }
-        } else { // All else is bad... so false
-            return false;
         }
     });
 
     // Token generator/signer, should only be used within the user class
-    var tokenGenerator = function(userId,userEmail,userSocket,userDisplayname){
+    var tokenGenerator = function(userId,userEmail,userSockets,userDisplayname){
+        var allSockets = [];
         if(!validator.isAlphanumeric(userDisplayname)){
             userDisplayname = null;
         }
+        console.log({userSockets:userSockets,what:typeof userSockets});
+        if(typeof userSockets === "string"){
+            allSockets.push(userSockets);
+        } else {
+            allSockets = userSockets;
+        }
         return jwt.sign(
-            {id: userId, email: userEmail, displayname: userDisplayname, socket: userSocket},
+            {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets},
             secret,
             {expiresInMinutes: 10080});
     };
@@ -60,7 +75,8 @@ module.exports = function (io,socket) {
                 var User = mongoose.model("User");
                 User.findOne({email: decode.email}, function (err, result) {
                     if(result) { // If user was found
-                        var token = tokenGenerator(result._id,result.email,socket.id,result.displayname);
+                        decode.sockets.push(socket.id);
+                        var token = tokenGenerator(result._id,result.email,decode.sockets,result.displayname);
                         console.log({id: result._id, email: result.email, token: token});
                         socket.emit("user:accountInfo", {
                             id: result._id,

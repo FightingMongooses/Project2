@@ -20,7 +20,12 @@ global.mongoose = require("mongoose.models.autoload")(require("mongoose"), requi
 // JsonWebTokens
 global.jwt = require("jsonwebtoken");
 global.secret = "uncreativesecret";
+// Validator module
+// https://www.npmjs.com/package/validator
 global.validator = require("validator");
+// Lodash
+global._ = require("lodash");
+
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
