@@ -6,12 +6,21 @@ var logger = require("morgan");
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 //var mongoose = require("mongoose");
+var socket_io = require("socket.io");
 
+// Express
 var app = express();
+// Socket.io
+var io = socket_io();
+app.io = io;
 
 // Mongodb connection and a mongoose model autoloader
 // https://www.npmjs.com/package/mongoose.models.autoload
 global.mongoose = require("mongoose.models.autoload")(require("mongoose"), require("path").join(__dirname, "models"), true).connect("mongodb://localhost/cpsc473fightingmongooses");
+// JsonWebTokens
+global.jwt = require("jsonwebtoken");
+global.secret = "uncreativesecret";
+global.validator = require("validator");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -26,12 +35,15 @@ app.use(cookieParser());
 app.use(require("less-middleware")(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "public")));
 
-
+// HTTP Routes
 var routes = require("./routes/index");
-var user = require("./routes/user");
+//var user = require("./routes/user");
 
 app.use("/", routes);
-app.use("/user", user);
+//app.use("/user", user);
+
+// Socket Events
+require("./socket")(app.io);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

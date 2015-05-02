@@ -1,21 +1,9 @@
-//
-   Created by zaephor on 4/22/15.
-extends ../layout
-
-block head
-block header
-block content
-  form.form-signin#signin(method="post",action="/user/signin")
-    h2.form-signin-heading Sign in\Register
-    label.sr-only(for="inputEmail") Email address
-    input.form-control#inputEmail(type="email",placeholder="Email address",required,autofocus,name="email")
-    label.sr-only(for="inputPassword") Password
-    input.form-control#inputPassword(type="password",placeholder="Password",required,name="password")
-    div.checkbox
-      label
-        input(type="checkbox",value="remember-me",name="remember")
-        | Remember me
-    button.btn.btn-lg.btn-primary(type="submit",name="action",value="signin") Sign in
-    button.btn.btn-lg.btn-primary(type="submit",name="action",value="register") Register
-block footer
-block foot
+.modal#signIn(title="Sign In or Register")
+    form
+        .form-group
+            label.control-label(for="email") Email
+            input#email.text.ui-widget-content.ui-corner-all.form-control(type="email",name="email")
+        .form-group
+            label.control-label(for="password") Password
+            input#password.text.ui-widget-content.ui-corner-all.form-control(type="password",name="password")
+        input.hidden(type="submit",tabindex="-1")

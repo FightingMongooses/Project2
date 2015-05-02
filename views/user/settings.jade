@@ -1,0 +1,11 @@
+.modal#userSettings(title="User Settings")
+    form
+        fieldset(disabled)
+            .form-group
+                label.control-label(for="email") Email
+                input#email.text.ui-widget-content.ui-corner-all.form-control(type="email",name="email",value="")
+        fieldset
+            .form-group
+                label.control-label(for="displayname") Username
+                input#displayname.text.ui-widget-content.ui-corner-all.form-control(type="text",name="displayname",value="")
+        input.hidden(type="submit",tabindex="-1")
