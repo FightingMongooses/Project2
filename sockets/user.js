@@ -13,7 +13,6 @@ module.exports = function (io,socket) {
             decoded = null;
         }
         var thisSocket = socket.id;
-        console.log({validator:decoded,socket:socket.id});
         if(decoded === null){ // Token error of some sort
             return false;
         } else if(decoded.socket === thisSocket){ // Sockets match, no need to verify further since token passed as valid
@@ -22,10 +21,16 @@ module.exports = function (io,socket) {
             if(typeof io.sockets.connected[decoded.socket] === "undefined"){
                 // Token's socket is dead, token should be refreshed shortly. Consider this valid.
                 return decoded;
-            } else {
-                // Token's socket is live, this is probably an intrusion attempt? Consider invalid, ideally delete client-side
-                socket.emit("user:signinError", {token: true}); // Run token delete command client-side
-                return false;
+            } else { // Token's socket is live, is this an intrusion attempt?
+                //Check user IP, if IPs don't match, consider intrusion
+                if(io.sockets.connected[decoded.socket].conn._remoteAddress === io.sockets.connected[thisSocket].conn._remoteAddress){
+                    // Looks like duplicate socket from same IP, consider valid.
+                    return decoded;
+                } else {
+                    // IPs don't match, invalid the newer session
+                    socket.emit("user:signinError", {token: true}); // Run token delete command client-side
+                    return false;
+                }
             }
         } else { // All else is bad... so false
             return false;
