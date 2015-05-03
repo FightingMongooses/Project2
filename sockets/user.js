@@ -7,40 +7,50 @@ module.exports = function (io,socket) {
     // Token verifier, check if socket id in token exists, if it does, verify that current socket/user matches it
     validator.extend("isValidToken",function(token){
         var decoded = null;
+        var thisSocket = socket.id;
         try {
             decoded = jwt.verify(token, secret);
         } catch(err) {
             decoded = null;
         }
-        var thisSocket = socket.id;
-        console.log({test:decoded});
+        var checkSocketLive = function(element,index,array){
+            if(typeof io.sockets.connected[element] === "undefined"){
+                return false;
+            } else {
+                return true;
+            }
+        };
+        var compareSocketIP = function(element,index,array){
+            if(typeof io.sockets.connected[element] === "undefined"){
+                return false;
+            } else if(io.sockets.connected[element].conn._remoteAddress !== io.sockets.connected[thisSocket].conn._remoteAddress) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+        console.log({isValidToken:decoded});
         if(decoded === null || typeof decoded.sockets === "undefined"){ // Token error of some sort
+            console.log({isValidToken:"Error, decoded null or undefined",decoded:decoded});
             socket.emit("user:signinError", {token: true}); // Run token delete command client-side
             return false;
         } else if(decoded.sockets.indexOf(thisSocket) > -1 ){ // Sockets match, no need to verify further since token passed as valid
-            console.log({what:decoded});
+            console.log({isValidToken:"This socket is in the token list",decoded:decoded});
             return decoded;
         } else { // Current socket not listed in token, verify by IP for now
-            var liveSockets = {};
             // Check if all listed sockets are dead, if they are, consider this socket live. Token should be updated soon enough
-            _.forEach(decoded.sockets,function(k,v){ // Grab all the IP addresses for live sockets
-                if(typeof io.sockets.connected[v] !== "undefined") {
-                    liveSockets[v] = io.sockets.connected[v].conn._remoteAddress;
-                } else { // Socket is dead, pull from decoded object incase token is regenerated later
-                    _.pull(decoded.sockets,v);
-                }
-            });
-            if(Object.keys(liveSockets).length > 0){ // If any of the existing listed sockets are live, compare their IPs
-                if (liveSockets.indexOf(io.sockets.connected[thisSocket].conn._remoteAddress) > -1){
-                    console.log({what:decoded});
-                    return decoded; // IP address was found in list
-                } else { // IP not found in active list, kill new user socket
+            if(decoded.sockets.some(compareSocketIP)){ // if at least one succeeds
+                console.log({isValidToken:"IP address matches one of the sockets",decoded:decoded});
+                return decoded;
+            } else { // No matching IPs, if all sockets are dead, consider this one valid
+                if(!decoded.sockets.some(checkSocketLive)){ // All listed sockets dead, this one is probably ok
+                    console.log({isValidToken:"All old sockets dead",decoded:decoded});
+                    return decoded;
+                } else { // At least one socket is alive, this is bad
+                    console.log({isValidToken:"No matching IP",decoded:decoded});
                     socket.emit("user:signinError", {token: true}); // Run token delete command client-side
                     return false;
                 }
-            } else { // No living sockets, consider valid token
-                console.log({what:decoded});
-                return decoded;
             }
         }
     });
