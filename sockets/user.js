@@ -13,6 +13,7 @@ module.exports = function (io,socket) {
         } catch(err) {
             decoded = null;
         }
+        // Check if at least one of the sockets is still alive
         var checkSocketLive = function(element,index,array){
             if(typeof io.sockets.connected[element] === "undefined"){
                 return false;
@@ -20,6 +21,7 @@ module.exports = function (io,socket) {
                 return true;
             }
         };
+        // Check if the current socket's IP matches any other live IP's for this token
         var compareSocketIP = function(element,index,array){
             if(typeof io.sockets.connected[element] === "undefined"){
                 return false;
