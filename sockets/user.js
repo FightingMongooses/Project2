@@ -12,17 +12,6 @@ module.exports = function (io,socket) {
             return true;
         }
     };
-    // Functino to check if the current socket"s IP matches any other live IP"s for this token
-    var compareSocketIP = function(element,index,array){
-        if(typeof io.sockets.connected[element] === "undefined"){
-            return false;
-        } else if(io.sockets.connected[element].conn._remoteAddress !== io.sockets.connected[thisSocket].conn._remoteAddress) {
-            return false;
-        } else {
-            return true;
-        }
-    };
-
     // Token verifier, check if socket id in token exists, if it does, verify that current socket/user matches it
     validator.extend("isValidToken",function(token){
         var decoded = null;
@@ -32,6 +21,18 @@ module.exports = function (io,socket) {
         } catch(err) {
             decoded = null;
         }
+
+        // Function to check if the current socket"s IP matches any other live IP"s for this token
+        var compareSocketIP = function(element,index,array){
+            if(typeof io.sockets.connected[element] === "undefined"){
+                return false;
+            } else if(io.sockets.connected[element].conn._remoteAddress !== io.sockets.connected[thisSocket].conn._remoteAddress) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
         console.log({isValidToken:decoded});
         if(decoded === null || typeof decoded.sockets === "undefined"){ // Token error of some sort
             console.log({isValidToken:"Error, decoded null or undefined",decoded:decoded});
@@ -64,20 +65,21 @@ module.exports = function (io,socket) {
         if(!validator.isAlphanumeric(userDisplayname)){
             userDisplayname = null;
         }
-        console.log({userSockets:userSockets,what:typeof userSockets});
         if(typeof userSockets === "string"){
             allSockets.push(userSockets);
         } else {
-            allSockets = userSockets;
+            allSockets = _.unique(userSockets);
         }
         allSockets = allSockets.filter(checkSocketLive);
+        console.log({userSockets:allSockets,what:typeof allSockets});
         var token = jwt.sign(
             {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets},
             secret,
             {expiresInMinutes: 10080});
         allSockets.forEach(function(element,index,array){
             //socket.emit("user:setToken", {token: token});
-            socket.broadcast.to(element).emit("setToken",{token: token});
+            console.log({token:token,element:element});
+            io.to(element).emit("user:setToken",{token: token});
         });
         return token;
     };
@@ -157,7 +159,7 @@ module.exports = function (io,socket) {
                             if(typeof result.displayname === "undefined"){
                                 socket.emit("user:trigger", {settings: true});
                             }
-                        } else { // Password doesn"t match
+                        } else { // Password doesn't match
                             socket.emit("user:signinError", {password: true});
                         }
                     });
@@ -183,8 +185,38 @@ module.exports = function (io,socket) {
     });
     socket.on("user:changepassword",function(msg){
         console.log({action:"changepassword",msg:msg});
+        if(msg.newpassword === msg.confirmpassword && msg.newpassword !== msg.oldpassword) { // new + confirm passwords match, and don't match oldpassword
+            if (validator.isValidToken(msg.token)) { // Check token is valid
+                var User = mongoose.model("User");
+                User.findOne(msg.email, function (err, result) { // Find the user's account
+                    if (result !== null) { // Account was found
+                        result.comparePassword(msg.oldpassword, function (err, match) { // Check if oldpassword was valid
+                            if (match) { // Password was a match
+                                result.password = msg.newpassword;
+                                result.save();
+                                console.log({action:"Password changed",msg:msg});
+                                socket.emit("user:trigger", {changePassword: false});
+                            } else { // Error of some sort, old password probably didn't match
+                                socket.emit("user:signinError",{oldpassword:true});
+                            }
+                        });
+                    } else { // Account wasn't found... new issue....
+                        console.log({account:"notfound",msg:msg});
+                    }
+                });
+            }
+        } else { // Confirm and new don't match
+            socket.emit("user:signinError",{newpassword:true,confirmpassword:true});
+        }
     });
     socket.on("user:logout",function(msg){
-        console.log({action:"logout",msg:msg});
+        var decode = validator.isValidToken(msg.token);
+        if(decode !== false) { // Token is valid, we have data
+            console.log({action:"logout",msg:msg});
+            decode.sockets.forEach(function(element,index,array){ // logging all active sockets out from this user
+                console.log({token:msg.token,element:element});
+                io.to(element).emit("user:signinError",{token: true}); // Tell all sockets to clear their tokens(which logs them out)
+            });
+        }
     });
 };

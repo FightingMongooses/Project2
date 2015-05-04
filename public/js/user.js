@@ -2,7 +2,7 @@
 
 var user = {
     info: {
-        token: null,
+        token: null
     },
     send: {
         register: function(){
@@ -12,10 +12,15 @@ var user = {
             socket.emit("user:signin",{email:$("div#signIn input#email").val(),password:$("div#signIn input#password").val()});
         },
         settings: function(){
-            socket.emit("user:settings",{email:$("div#userSettings input#email").val(),displayname:$("div#userSettings input#displayname").val()});
+            socket.emit("user:settings",{email:$("div#userSettings input#email").val(),displayname:$("div#userSettings input#displayname").val(),token:user.info.token});
         },
         changePassword: function(){
-            socket.emit("user:changepassword",{oldpassword:$("div#changePassword input#oldpassword").val(),newpassword:$("div#changePassword input#oldpassword").val(),confirmpassword:$("div#changePassword input#confirmpassword").val()});
+            socket.emit("user:changepassword",{oldpassword:$("div#changePassword input#oldpassword").val(),newpassword:$("div#changePassword input#newpassword").val(),confirmpassword:$("div#changePassword input#confirmpassword").val(),token:user.info.token});
+/*
+            $("div#changePassword input#oldpassword").val("");
+            $("div#changePassword input#newpassword").val("");
+            $("div#changePassword input#confirmpassword").val("");
+*/
         }
     },
     modal: {
@@ -89,10 +94,11 @@ var user = {
         });
         $("a#logoutLink").on("click",function(event){
             event.preventDefault();
-            socket.emit("user:logout",{});
+            socket.emit("user:logout",{token:user.info.token});
             $("li.guest").removeClass("hidden");
             $("li.user").addClass("hidden");
             //TODO: Clear local storage too
+            user.info.token = null;
             localStorage.clear();
         });
         // Override pressing enter/submit in modal forms
@@ -117,6 +123,16 @@ var user = {
                 user.modal.settings.dialog("open");
             } else if(typeof msg.settings === "boolean" && msg.settings === false) {
                 user.modal.settings.dialog("close");
+            } else if(typeof msg.changePassword === "boolean" && msg.changePassword === true) {
+                $("div#changePassword input#oldpassword").val("");
+                $("div#changePassword input#newpassword").val("");
+                $("div#changePassword input#confirmpassword").val("");
+                user.modal.changePassword.dialog("open");
+            } else if(typeof msg.changePassword === "boolean" && msg.changePassword === false) {
+                $("div#changePassword input#oldpassword").val("");
+                $("div#changePassword input#newpassword").val("");
+                $("div#changePassword input#confirmpassword").val("");
+                user.modal.changePassword.dialog("close");
             }
         });
         socket.on("user:error",function(msg){
@@ -141,20 +157,32 @@ var user = {
             if(typeof msg.password === "boolean" && msg.password === true){
                 $("input#password").parent().addClass("has-error");
             }
+            if(typeof msg.newpassword === "boolean" && msg.newpassword === true){
+                $("input#newpassword").parent().addClass("has-error");
+            }
+            if(typeof msg.confirmpassword === "boolean" && msg.confirmpassword === true){
+                $("input#confirmpassword").parent().addClass("has-error");
+            }
+            if(typeof msg.oldpassword === "boolean" && msg.oldpassword === true){
+                $("input#oldpassword").parent().addClass("has-error");
+            }
             if(typeof msg.displayname === "boolean" && msg.displayname === true){
                 $("input#displayname").parent().addClass("has-error");
             }
             if(typeof msg.token === "boolean" && msg.token === true){
                 $(".guest").removeClass("hidden");
                 $(".user").addClass("hidden");
+                $("input").parent().removeClass("has-error");
+                user.info.token = null;
                 localStorage.clear();
             }
         });
         socket.on("user:setToken",function(msg){
+            console.log({setToken:msg});
             // Store token in local storage
             // REF: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
             localStorage.setItem("token",msg.token);
-            user.token = msg.token;
+            user.info.token = msg.token;
             // Close modal login screens
             user.modal.signin.dialog("close");
             // Toggle nav menus
