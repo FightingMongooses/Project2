@@ -33,7 +33,7 @@ html
                 a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Buddies
                 ul.dropdown-menu(role="menu")
                   li
-                    a(href="#",id="buddyFind") Add buddy
+                    a(href="#",id="buddyAdd") Add buddy
                   li
                     a(href="#",id="buddyList") Manage buddies
               li.dropdown.user.hidden
@@ -52,6 +52,7 @@ html
       block content
       block footer
     include user.jade
+    include buddy.jade
     include chat.jade
     include game.jade
     script(src="/socket.io/socket.io.js")
@@ -60,6 +61,7 @@ html
     script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js")
     script(src="/js/connect.js")
     script(src="/js/user.js")
+    script(src="/js/buddy.js")
     script(src="/js/chat.js")
     script(src="/js/game.js")
     //script(src="/js/something.js")
