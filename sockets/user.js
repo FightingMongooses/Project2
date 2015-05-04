@@ -21,7 +21,7 @@ module.exports = function (io,socket) {
                 return true;
             }
         };
-        // Check if the current socket's IP matches any other live IP's for this token
+        // Check if the current socket"s IP matches any other live IP"s for this token
         var compareSocketIP = function(element,index,array){
             if(typeof io.sockets.connected[element] === "undefined"){
                 return false;
@@ -69,10 +69,16 @@ module.exports = function (io,socket) {
         } else {
             allSockets = userSockets;
         }
-        return jwt.sign(
-            {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets.filter(checkSocketLive)},
+        allSockets = allSockets.filter(checkSocketLive);
+        var token = jwt.sign(
+            {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets},
             secret,
             {expiresInMinutes: 10080});
+        allSockets.forEach(function(element,index,array){
+            //socket.emit("user:setToken", {token: token});
+            socket.broadcast.to(element).emit("setToken",{token: token});
+        });
+        return token;
     };
 
     // User functions
@@ -95,7 +101,7 @@ module.exports = function (io,socket) {
                             email: result.email,
                             displayname: result.displayname
                         });
-                        socket.emit("user:setToken", {token: token});
+                        //socket.emit("user:setToken", {token: token});
                         if (typeof result.displayname === "undefined") {
                             socket.emit("user:trigger", {settings: true});
                         }
@@ -123,7 +129,7 @@ module.exports = function (io,socket) {
                     var token = tokenGenerator(create._id,create.email,socket.id);
                     console.log({id: create._id, email: create.email, token: token});
                     socket.emit("user:accountInfo",{id:create._id,email:create.email,displayname:create.displayname});
-                    socket.emit("user:setToken", {token: token});
+                    //socket.emit("user:setToken", {token: token});
                     socket.emit("user:trigger", {settings: true});
                 } else { // User account found, return error to user
                     socket.emit("user:signinError", {email: true});
@@ -146,11 +152,11 @@ module.exports = function (io,socket) {
                         } else if (match) { // Password matches, send JWT Token
                             var token = tokenGenerator(result._id,result.email,socket.id);
                             socket.emit("user:accountInfo",{id:result._id,email:result.email,displayname:result.displayname});
-                            socket.emit("user:setToken", {token: token});
+                            //socket.emit("user:setToken", {token: token});
                             if(typeof result.displayname === "undefined"){
                                 socket.emit("user:trigger", {settings: true});
                             }
-                        } else { // Password doesn't match
+                        } else { // Password doesn"t match
                             socket.emit("user:signinError", {password: true});
                         }
                     });
