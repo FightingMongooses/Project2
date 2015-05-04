@@ -54,8 +54,8 @@ var chat = {
                         $("<span>").addClass("user").append(msg.user),": ",
                         $("<span>").addClass("text").append(msg.text)
                     )
-                ));
-                // TODO Make this autoscroll to bottom of modal pop-up
+                );
+                // TODO Make this autoscroll to bottom of modal pop-up since messages are appended here
             }
         });
     }
