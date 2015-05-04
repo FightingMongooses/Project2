@@ -4,6 +4,25 @@
 // REF: https://github.com/auth0/node-jsonwebtoken
 
 module.exports = function (io,socket) {
+    // Function to check if at least one of the sockets is still alive
+    var checkSocketLive = function(element,index,array){
+        if(typeof io.sockets.connected[element] === "undefined"){
+            return false;
+        } else {
+            return true;
+        }
+    };
+    // Functino to check if the current socket"s IP matches any other live IP"s for this token
+    var compareSocketIP = function(element,index,array){
+        if(typeof io.sockets.connected[element] === "undefined"){
+            return false;
+        } else if(io.sockets.connected[element].conn._remoteAddress !== io.sockets.connected[thisSocket].conn._remoteAddress) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
     // Token verifier, check if socket id in token exists, if it does, verify that current socket/user matches it
     validator.extend("isValidToken",function(token){
         var decoded = null;
@@ -13,24 +32,6 @@ module.exports = function (io,socket) {
         } catch(err) {
             decoded = null;
         }
-        // Check if at least one of the sockets is still alive
-        var checkSocketLive = function(element,index,array){
-            if(typeof io.sockets.connected[element] === "undefined"){
-                return false;
-            } else {
-                return true;
-            }
-        };
-        // Check if the current socket"s IP matches any other live IP"s for this token
-        var compareSocketIP = function(element,index,array){
-            if(typeof io.sockets.connected[element] === "undefined"){
-                return false;
-            } else if(io.sockets.connected[element].conn._remoteAddress !== io.sockets.connected[thisSocket].conn._remoteAddress) {
-                return false;
-            } else {
-                return true;
-            }
-        };
         console.log({isValidToken:decoded});
         if(decoded === null || typeof decoded.sockets === "undefined"){ // Token error of some sort
             console.log({isValidToken:"Error, decoded null or undefined",decoded:decoded});
