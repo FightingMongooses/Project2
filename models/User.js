@@ -1,3 +1,4 @@
+// REF: http://mongoosejs.com/docs/populate.html <-- For external object references and populations
 "use strict";
 var bcrypt = require("bcrypt"),
     SALT_WORK_FACTOR = 10;
@@ -7,18 +8,19 @@ module.exports = function(mongoose){
     var Card = mongoose.model("Card");
 
     // Actual Schema
-    var user = new mongoose.Schema({
+    var User = new mongoose.Schema({
         displayname: String,
         email: {type: String, unique: true, required: true},
         password: {type: String, required: true},
         wins: {type: Number, default: 0 },
         losses: {type: Number, default: 0 },
         deck: [Card],
+        friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
         created_on: {type: Date},
         updated_on: {type: Date}
     });
 
-    user.pre("save", function(next) {
+    User.pre("save", function(next) {
         // Set timestamps
         var now = new Date();
         this.updated_on = now;
@@ -55,7 +57,7 @@ module.exports = function(mongoose){
     });
 
     // Password comparison
-    user.methods.comparePassword = function(candidatePassword, cb) {
+    User.methods.comparePassword = function(candidatePassword, cb) {
         bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
             if (err){
                 return cb(err);
@@ -65,9 +67,9 @@ module.exports = function(mongoose){
     };
 
     // Test function
-    user.methods.test = function(){
+    User.methods.test = function(){
         return "model1";
     };
 
-    return user;
+    return User;
 };

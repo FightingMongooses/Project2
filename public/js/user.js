@@ -2,7 +2,9 @@
 
 var user = {
     info: {
-        token: null
+        token: null,
+        displayname: null,
+        email: null
     },
     send: {
         register: function(){
@@ -195,6 +197,8 @@ var user = {
             $("input#email").val(msg.email);
             if(typeof msg.displayname !== "undefined"){
                 $("input#displayname").val(msg.displayname);
+                user.info.displayname = msg.displayname;
+                user.info.email = msg.email;
             }
         });
     }

@@ -3,7 +3,7 @@
 module.exports = function(mongoose){
 
     // Actual Schema
-    var card = new mongoose.Schema({
+    var Card = new mongoose.Schema({
         title: {type: String, unique: true},
         picture: String,
         up: Number,
@@ -13,9 +13,9 @@ module.exports = function(mongoose){
     });
 
     // Test function
-    card.methods.test = function(){
+    Card.methods.test = function(){
         return "model1";
     };
 
-    return card;
+    return Card;
 };

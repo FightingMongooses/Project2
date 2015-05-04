@@ -6,6 +6,7 @@ html
     link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css")
     link(rel="stylesheet", href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css")
     link(rel="stylesheet", href="/css/style.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
     block head
   body
     .header
@@ -23,6 +24,18 @@ html
               li.guest
                 // a(href="/user/signin") Sign In
                 a(href="#",id="signinLink") Sign In
+              li.dropdown.user.hidden
+                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Chat
+                ul.dropdown-menu(role="menu")
+                  li
+                    a(href="#",id="chatGlobal") Global
+              li.dropdown.user.hidden
+                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Buddies
+                ul.dropdown-menu(role="menu")
+                  li
+                    a(href="#",id="buddyFind") Add buddy
+                  li
+                    a(href="#",id="buddyList") Manage buddies
               li.dropdown.user.hidden
                 a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Account
                 ul.dropdown-menu(role="menu")
