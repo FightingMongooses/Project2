@@ -18,11 +18,6 @@ var user = {
         },
         changePassword: function(){
             socket.emit("user:changepassword",{oldpassword:$("div#changePassword input#oldpassword").val(),newpassword:$("div#changePassword input#newpassword").val(),confirmpassword:$("div#changePassword input#confirmpassword").val(),token:user.info.token});
-/*
-            $("div#changePassword input#oldpassword").val("");
-            $("div#changePassword input#newpassword").val("");
-            $("div#changePassword input#confirmpassword").val("");
-*/
         }
     },
     modal: {
