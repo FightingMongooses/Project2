@@ -16,7 +16,10 @@ app.io = io;
 
 // Mongodb connection and a mongoose model autoloader
 // https://www.npmjs.com/package/mongoose.models.autoload
-global.mongoose = require("mongoose.models.autoload")(require("mongoose"), require("path").join(__dirname, "models"), true).connect("mongodb://localhost/cpsc473fightingmongooses");
+if(typeof process.env.MONGO_URL === "undefined"){
+	process.env.MONGO_URL = "mongodb://localhost/cpsc473"
+}
+global.mongoose = require("mongoose.models.autoload")(require("mongoose"), require("path").join(__dirname, "models"), true).connect(process.env.MONGO_URL);
 // JsonWebTokens
 global.jwt = require("jsonwebtoken");
 global.secret = "uncreativesecret";
