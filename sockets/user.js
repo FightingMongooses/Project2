@@ -76,7 +76,9 @@ module.exports = function (io,socket) {
             {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets},
             secret,
             {expiresInMinutes: 10080});
-        allSockets.forEach(function(element,index,array){
+        // REF: http://stackoverflow.com/questions/10058226/send-response-to-all-clients-except-sender-socket-io <-- For the basic idea
+        // REF: http://stackoverflow.com/a/24722062 <-- for socket.io > 1.0
+        allSockets.forEach(function(element,index,array){ // Send this message to all sockets in this list
             //socket.emit("user:setToken", {token: token});
             console.log({token:token,element:element});
             io.to(element).emit("user:setToken",{token: token});
