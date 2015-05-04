@@ -40,19 +40,19 @@ module.exports = function (io,socket) {
             console.log({isValidToken:"This socket is in the token list",decoded:decoded});
             return decoded;
         } else { // Current socket not listed in token, verify by IP for now
-            // Check if all listed sockets are dead, if they are, consider this socket live. Token should be updated soon enough
-            if(decoded.sockets.some(compareSocketIP)){ // if at least one succeeds
+            // Token socket garbage collection(Trim dead sockets from decoded list)
+            decoded.sockets = decoded.sockets.filter(checkSocketLive);
+            if(decoded.sockets.length === 0){ // All listed sockets dead, this one is probably ok(user closed+reopened tab?)
+                decoded.sockets.push(thisSocket);
+                console.log({isValidToken:"All old sockets dead",decoded:decoded});
+                return decoded;
+            } else if(decoded.sockets.some(compareSocketIP)){ // There are still active sockets, if at least one has matching IP, still good
                 console.log({isValidToken:"IP address matches one of the sockets",decoded:decoded});
                 return decoded;
-            } else { // No matching IPs, if all sockets are dead, consider this one valid
-                if(!decoded.sockets.some(checkSocketLive)){ // All listed sockets dead, this one is probably ok
-                    console.log({isValidToken:"All old sockets dead",decoded:decoded});
-                    return decoded;
-                } else { // At least one socket is alive, this is bad
-                    console.log({isValidToken:"No matching IP",decoded:decoded});
-                    socket.emit("user:signinError", {token: true}); // Run token delete command client-side
-                    return false;
-                }
+            } else { // Active socket on another IP is using this token, assume socket jacking attempt
+                console.log({isValidToken:"Either no matching IP, or all sockets",decoded:decoded});
+                socket.emit("user:signinError", {token: true}); // Run token delete command client-side
+                return false;
             }
         }
     });
@@ -70,7 +70,7 @@ module.exports = function (io,socket) {
             allSockets = userSockets;
         }
         return jwt.sign(
-            {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets},
+            {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets.filter(checkSocketLive)},
             secret,
             {expiresInMinutes: 10080});
     };
