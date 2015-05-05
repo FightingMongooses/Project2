@@ -54,7 +54,7 @@ NORG 6 5 8 4
 Ochu 5 6 3 3
 Oilboyle 1 8 4 8
 Propagator 8 4 4 8
-PuPu 3 A 2 1
+PuPu 3 10 2 1
 RedBat 6 1 1 2
 RedGiant 6 8 4 7
 RubyDragon 7 2 7 4
