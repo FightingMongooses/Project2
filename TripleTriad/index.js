@@ -234,7 +234,7 @@ lr.on('line', function(line){
             "right": cardData[2],
             "bottom": cardData[3],
             "left": cardData[4],
-            "data": imgPath
+            "data": codedImg
       };
       // add card to database
       cards.push(card);     // array until mongodb is set up
