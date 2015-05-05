@@ -165,8 +165,8 @@ module.exports = function (io,socket) {
               Room.findOne({name: socket.rooms[1]},function(err, result){
                            if(!err){
                            thisRoom  = result;
-                           console.log("socket room: " + socket.rooms);
-                           console.log({"thisRoom: " : thisRoom});
+//                           console.log("socket room: " + socket.rooms);
+//                           console.log({"thisRoom: " : thisRoom});
 //                           console.log({"all rooms: ": rooms});
                            if(socket.username !== thisRoom.turn){
                            socket.emit('chat message', 'Really not your turn, cheater');
@@ -177,33 +177,27 @@ module.exports = function (io,socket) {
                            }else{
                            // check card validity
                            var data;
-                           var exists = false;
-                           cards.forEach(function(card){
-                                         if(card.name === ele){
-                                         data = card.data;
-                                         exists = true;
-                                         }
-                                         });
-                           if(exists){
-                           // place card
-                           io.to(socket.rooms[1]).emit('place element', data, pos);
-                           //              io.to(socket.rooms[1]).emit('change turn');
-                           if(thisRoom.turn === thisRoom.player1){
-                           thisRoom.turn = thisRoom.player2;
-                           }else{
-                           thisRoom.turn = thisRoom.player1;
+                           var exists = true;
+                           console.log(msg.card);
+                           Card.findOne({title: msg.card},function(err, result){
+                                        if(!err){
+                                        var imgPath = path.join(__dirname, "../public"+result.picture);
+                                        io.to(socket.rooms[1]).emit('game:updateBoard', result.picture, msg.position);
+                                        //              io.to(socket.rooms[1]).emit('change turn');
+                                        if(thisRoom.turn === thisRoom.player1){
+                                        thisRoom.turn = thisRoom.player2;
+                                        }else{
+                                        thisRoom.turn = thisRoom.player1;
+                                        }
+                                        thisRoom.board[loc] = 1;
+                                        }else{
+                                        // invalid card
+                                        socket.emit('chat message', 'no such card');
+                                        }
+                                        }
+                                        );
                            }
-                           thisRoom.board[loc] = 1;
-                           }else{
-                           // invalid card
-                           socket.emit('chat message', 'no such card');
-                           }
-                           }
-                           }
-                           }
-                           else{
-                           }
-                           });
+                           }}});
               
 
     });

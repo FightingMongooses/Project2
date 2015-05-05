@@ -16,9 +16,10 @@ var game = {
         });
         // Socket event capturing
         socket.on("game:updateBoard", function(data, pos){ // Place card on x/y
-            var posi = "label" + pos;
+            var posi = "#pos" + pos;
             var img = "img" + pos;
-            document.getElementById(img).src = "data:image/png;base64,"+data;
+                  console.log(data + " : " + posi);
+                  $(posi).html("<img src=" + data + ">");
         });
 
     }
