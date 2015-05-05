@@ -1,0 +1,10 @@
+.game.container#gameBoard
+    #place
+        input#input-x(type="text",size="2",value="x")
+        input#input-y(type="text",size="2",value="y")
+        input#element(type="text",size="30")
+        button#send-place Submit
+        each i in [0,1,2]
+            .row
+                each j in [0,1,2]
+                    .cell.col-md-4.grid-ele(id="pos"+i+""+j) Hi
