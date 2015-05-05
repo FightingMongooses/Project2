@@ -29,6 +29,11 @@ var io = app.io;
 io.attach( server );
 
 /**
+ * Run the index file in startup, this is to autoimport the cards
+ */
+require("../startup/index.js");
+
+/**
  * Listen on provided port, on all network interfaces.
  */
 
