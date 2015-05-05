@@ -48,15 +48,17 @@ var chat = {
         // Socket event listeners
         socket.on("chat:receive",function(msg){
             console.log({type:"chat",msg:msg});
-            if(msg.chat === "global"){
-                $(".chat#chatGlobal .messages").append(
+//            if(msg.chat === "global"){
+                  $(".chat#chatGlobal .messages").append(
                     $("<div>").append(
                         $("<span>").addClass("user").append(msg.user),": ",
                         $("<span>").addClass("text").append(msg.text)
                     )
                 );
                 // TODO Make this autoscroll to bottom of modal pop-up since messages are appended here
-            }
+                $('.chat#chatGlobal')[0].scrollTop = $('.chat#chatGlobal')[0].scrollHeight;
+                  // The input field and button still scroll with it, those need to be put somewhere else.
+//            }
         });
     }
 };

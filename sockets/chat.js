@@ -22,6 +22,7 @@ module.exports = function (io,socket) {
         if(decode){
             if(typeof msg.chat !== "undefined") {
                 // Transmit message to chatroom
+                msg.chat = socket.rooms[1]; // just for now.
                 io.to(msg.chat).emit("chat:receive",{chat:msg.chat,user:decode.displayname,text:msg.message,timestamp:Date()});
                 // Store message in recent message queue for this chat room
             }
