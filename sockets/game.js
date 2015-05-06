@@ -3,7 +3,7 @@
 
 module.exports = function (io,socket) {
 //    var fs = require('fs');
-//    var path = require('path');
+    var path = require('path');
 //    var filePath = path.join(__dirname, "../public/cards.txt");
 
 //    var LineByLineReader = require('line-by-line');
@@ -18,6 +18,7 @@ module.exports = function (io,socket) {
     }
 */
     var Card = mongoose.model("Card");
+    var User = mongoose.model("User");
     // get card data from file
 /*    lr.on('line', function(line){
           
@@ -118,8 +119,8 @@ module.exports = function (io,socket) {
         if(decode){
             socket.username = decode.displayname;
             // User connected
-            socket.emit("chat message", "You are connected");
-            io.to(lobby).emit("chat message", decode.displayname + " connected");
+            socket.emit("chat:receive", {chat:socket.rooms[1], user:"System", text: "You are connected", timestamp:Date()});
+            io.to(lobby).emit("chat:receive", {chat:socket.rooms[1], user:"System", text: decode.displayname + " connected", timestamp:Date()});
             // Join game lobby
             socket.join(lobby);
             // When another user joins, leave lobby, both join new room
@@ -170,16 +171,43 @@ module.exports = function (io,socket) {
 //                           console.log({"thisRoom: " : thisRoom});
 //                           console.log({"all rooms: ": rooms});
                            if(socket.username !== thisRoom.turn){
-                           socket.emit('chat message', 'Really not your turn, cheater');
+                           socket.emit('chat:receive', {chat:socket.rooms[1], user:"System", text: "Not your turn", timestamp:Date()});
                            //              socket.emit('change turn');
                            }else{
                            if(thisRoom.board[loc] === 1){
-                           socket.emit('chat message', 'Position taken');
+                           socket.emit('chat:receive', {chat:socket.rooms[1], user:"System", text: "Position taken", timestamp:Date()});
                            }else{
                            // check card validity
                            var data;
                            var exists = true;
                            console.log(msg.card);
+                           
+                           // check if player has card
+                           /*This should work once they have cards...
+                           User.findOne({displayname: socket.username}, function(err, result){
+                                if(!err){
+                                    var valid = false;
+                                    for(var c in result.deck){
+                                        if(c.title === msg.card){
+                                            valid = true;
+                                        }
+                                    }
+                                    if(valid){
+                                        var imgPath = path.join(__dirname, "../public"+result.picture);
+                                        io.to(socket.rooms[1]).emit('game:updateBoard', result.picture, msg.position);
+                                        if(thisRoom.turn === thisRoom.player1){
+                                            thisRoom.turn = thisRoom.player2;
+                                        }else{
+                                            thisRoom.turn = thisRoom.player1;
+                                        }
+                                        thisRoom.board[loc] = 1;
+                                    }else{
+                                        socket.emit("chat:receive", {chat:socket.rooms[1], user:"System", text: "You don't have that card", timestamp:Date()});
+                                    }
+                                }
+                            });*/
+                           
+                           // until then...
                            Card.findOne({title: msg.card},function(err, result){
                                         if(!err){
                                         var imgPath = path.join(__dirname, "../public"+result.picture);
