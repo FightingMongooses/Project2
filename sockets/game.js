@@ -2,20 +2,21 @@
 // REF: http://liangzan.net/blog/blog/2012/06/04/how-to-use-exports-in-nodejs/
 
 module.exports = function (io,socket) {
-    var fs = require('fs');
-    var path = require('path');
-    var filePath = path.join(__dirname, "../public/cards.txt");
+//    var fs = require('fs');
+//    var path = require('path');
+//    var filePath = path.join(__dirname, "../public/cards.txt");
 
-    var LineByLineReader = require('line-by-line');
-    var lr = new LineByLineReader(filePath);
+//    var LineByLineReader = require('line-by-line');
+//    var lr = new LineByLineReader(filePath);
     var lobby = "lobby";
 //    var rooms = [];
     var Room = mongoose.model("Room");
     var numRooms = 1;
     // get base64 string of image file
-    function base64Image(src){
+/*    function base64Image(src){
         return fs.readFileSync(src).toString("base64");
     }
+*/
     var Card = mongoose.model("Card");
     // get card data from file
 /*    lr.on('line', function(line){
