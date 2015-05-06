@@ -1,7 +1,8 @@
 "use strict";
 var chat = {
     send: function(chat,message){
-        socket.emit("chat:send",{chat:chat,message:message,token:user.info.token});
+        console.log(user.info); // displayname exists here
+        socket.emit("chat:send",{chat:chat,message:message,token:user.info.token, name: user.info.displayname});
     },
     modal: {
         global: $( "div#chatGlobal" ).dialog({

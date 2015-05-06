@@ -17,13 +17,18 @@ module.exports = function (io,socket) {
         }
     });
     socket.on("chat:send",function(msg){
-        console.log({msg:msg});
+//        console.log({msg:msg});
+              console.log("MSG");
+              console.log(msg.token)
+
         var decode = validator.isValidToken(msg.token);
+              console.log("Send");
+              console.log({decode: decode});        // this is where displayname got lost for client 2
         if(decode){
             if(typeof msg.chat !== "undefined") {
                 // Transmit message to chatroom
                 msg.chat = socket.rooms[1]; // just for now.
-                io.to(msg.chat).emit("chat:receive",{chat:msg.chat,user:decode.displayname,text:msg.message,timestamp:Date()});
+                io.to(msg.chat).emit("chat:receive",{chat:msg.chat,user:msg.name,text:msg.message,timestamp:Date()});
                 // Store message in recent message queue for this chat room
             }
         }
