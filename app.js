@@ -42,10 +42,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // HTTP Routes
 var routes = require("./routes/index");
-//var user = require("./routes/user");
 
 app.use("/", routes);
-//app.use("/user", user);
 
 // Socket Events
 require("./socket")(app.io);

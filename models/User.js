@@ -66,10 +66,5 @@ module.exports = function(mongoose){
         });
     };
 
-    // Test function
-    User.methods.test = function(){
-        return "model1";
-    };
-
     return User;
 };

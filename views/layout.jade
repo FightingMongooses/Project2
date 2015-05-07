@@ -1,70 +1,70 @@
 doctype html
 html
-  head
-    title= title
-    link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
-    link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css")
-    link(rel="stylesheet", href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css")
-    link(rel="stylesheet", href="/css/style.css")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    block head
-  body
-    .header
-      nav.navbar.navbar-inverse.navbar-fixed-bottom
-        .container-fluid
-          .navbar-header
-            button.navbar-toggle.collapsed(type="button",data-toggle="collapse",data-target="#bottombar-collapse")
-              span.sr-only Toggle navigation
-              span.icon-bar
-              span.icon-bar
-              span.icon-bar
-            a.navbar-brand Fighting Mongooses
-          .collapse.navbar-collapse#bottombar-collapse
-            ul.nav.navbar-nav.navbar-right
-              li.guest
-                // a(href="/user/signin") Sign In
-                a(href="#",id="signinLink") Sign In
-              li.user.hidden
-                a(href="#",id="gameJoin") Join Game
-              li.dropdown.user.hidden
-                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Chat
-                ul.dropdown-menu(role="menu")
-                  li
-                    a(href="#",id="chatGlobal") Global
-                  li
-                    a(href="#",id="chatGame") Game
-              li.dropdown.user.hidden
-                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Buddies
-                ul.dropdown-menu(role="menu")
-                  li
-                    a(href="#",id="buddyFind") Add buddy
-                  li
-                    a(href="#",id="buddyList") Manage buddies
-              li.dropdown.user.hidden
-                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Account
-                ul.dropdown-menu(role="menu")
-                  li
-                    //a(href="/user/settings") Settings
-                    a(href="#",id="settingsLink") Settings
-                  li
-                    a(href="#",id="changepasswordLink") Change Password
-                  li
-                    //a(href="/user/logout") Logout
-                    a(href="#",id="logoutLink") Logout
-    .container.main.guest
-      block header
-      block content
-      block footer
-    include user.jade
-    include chat.jade
-    include game.jade
-    script(src="/socket.io/socket.io.js")
-    script(src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js")
-    script(src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js")
-    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js")
-    script(src="/js/connect.js")
-    script(src="/js/user.js")
-    script(src="/js/chat.js")
-    script(src="/js/game.js")
-    //script(src="/js/something.js")
-    block foot
+    head
+        title= title
+        link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+        link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css")
+        link(rel="stylesheet", href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css")
+        link(rel="stylesheet", href="/css/style.css")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        block head
+    body
+        .header
+            nav.navbar.navbar-inverse.navbar-fixed-bottom
+                .container-fluid
+                    .navbar-header
+                        button.navbar-toggle.collapsed(type="button",data-toggle="collapse",data-target="#bottombar-collapse")
+                            span.sr-only Toggle navigation
+                            span.icon-bar
+                            span.icon-bar
+                            span.icon-bar
+                        a.navbar-brand Fighting Mongooses
+                    .collapse.navbar-collapse#bottombar-collapse
+                        ul.nav.navbar-nav.navbar-right
+                            li.guest
+                                // a(href="/user/signin") Sign In
+                                a(href="#",id="signinLink") Sign In
+                            li.user.hidden
+                                a(href="#",id="gameJoin") Join Game
+                            li.dropdown.user.hidden
+                                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Chat
+                                ul.dropdown-menu(role="menu")
+                                    li
+                                        a(href="#",id="chatGlobal") Global
+                                    li
+                                        a(href="#",id="chatGame") Game
+                            li.dropdown.user.hidden
+                                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Buddies
+                                ul.dropdown-menu(role="menu")
+                                    li
+                                        a(href="#",id="buddyFind") Add buddy
+                                    li
+                                        a(href="#",id="buddyList") Manage buddies
+                            li.dropdown.user.hidden
+                                a.dropdown-toggle(href="#",data-toggle="dropdown",role="button",aria-expanded="false") Account
+                                ul.dropdown-menu(role="menu")
+                                    li
+                                        //a(href="/user/settings") Settings
+                                        a(href="#",id="settingsLink") Settings
+                                    li
+                                        a(href="#",id="changepasswordLink") Change Password
+                                    li
+                                        //a(href="/user/logout") Logout
+                                        a(href="#",id="logoutLink") Logout
+        .container.main.guest
+            block header
+            block content
+            block footer
+        include user.jade
+        include chat.jade
+        include game.jade
+        script(src="/socket.io/socket.io.js")
+        script(src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js")
+        script(src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js")
+        script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js")
+        script(src="/js/connect.js")
+        script(src="/js/user.js")
+        script(src="/js/chat.js")
+        script(src="/js/game.js")
+        //script(src="/js/something.js")
+        block foot

@@ -12,10 +12,5 @@ module.exports = function(mongoose){
         right: Number
     });
 
-    // Test function
-    Card.methods.test = function(){
-        return "model1";
-    };
-
     return Card;
 };
