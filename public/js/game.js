@@ -12,7 +12,7 @@ var game = {
 
             var m = x + "" + y;
 //        socket.emit("chat message", m);
-            socket.emit("game:placeCard", {card:card, position:m});
+            socket.emit("game:placeCard", {card:card, position:m,current:game.current});
 //            socket.emit("change turn");
         });
         $("a#gameJoin").click(function(event){
