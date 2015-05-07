@@ -6,7 +6,7 @@ var router = express.Router();
 router.get("/", function(req, res, next) {
     var User = mongoose.model("User"); // https://www.npmjs.com/package/mongoose.models.autoload
 //    console.log(User);
-    res.render("index", { title: "Express" });
+    res.render("index", { title: "Fighting Mongooses" });
 });
 
 module.exports = router;
