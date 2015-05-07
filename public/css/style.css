@@ -1,1 +1,1 @@
-body{font:14px "Lucida Grande",Helvetica,Arial,sans-serif}.hidden{position:absolute;top:-1000px}.chat .send{position:absolute;bottom:0px}.game .row .cell{width:95px;height:122px}
+body{font:14px "Lucida Grande",Helvetica,Arial,sans-serif}.hidden{position:absolute;top:-1000px}.chat .send{position:absolute;bottom:0px}.game .row .cell{border:1px solid black;width:95px;height:122px}
