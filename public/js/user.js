@@ -185,6 +185,7 @@ var user = {
             // Toggle nav menus
             $(".guest").addClass("hidden");
             $(".user").removeClass("hidden");
+            socket.emit("chat:join",{room:"global",token:user.info.token});
             $("input").parent().removeClass("has-error");
 //            socket.emit("game:connect",{token:user.info.token});
         });

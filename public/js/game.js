@@ -1,5 +1,6 @@
 "use strict";
 var game = {
+    current: null,
     eventHandlers: function () {
         // Override clicks
         $("#send-place").click(function(event) {

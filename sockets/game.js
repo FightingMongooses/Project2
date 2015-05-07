@@ -8,7 +8,7 @@ module.exports = function (io,socket) {
 
 //    var LineByLineReader = require('line-by-line');
 //    var lr = new LineByLineReader(filePath);
-    var lobby = "lobby";
+//    var lobby = "lobby";
 //    var rooms = [];
     var Room = mongoose.model("Room");
     var numRooms = 1;
@@ -130,13 +130,14 @@ module.exports = function (io,socket) {
                     socket.emit("chat:receive",{chat:result.name, user:"System", text:"You are connected to " + result.name + " as player 2", timestamp:Date()});
                 }else{
                     var room = new Room({
-                        name:"game" + numRooms,
+                        name:"newGame"+Math.floor(new Date() / 1000),
                         player1:decode.displayname,
                         player2:null,
                         turn: null,
                         board:[0,0,0,0,0,0,0,0,0]
                     });
-                    numRooms= numRooms+1;
+                    room.name = "Game" + room._id;
+//                    numRooms= numRooms+1;
                     socket.join(room.name);
                     room.save();
                     socket.emit("chat:receive",{chat:room.name, user:"System", text:"You are connected to " + room.name + " as player 1", timestamp:Date()});
