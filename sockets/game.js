@@ -61,14 +61,12 @@ module.exports = function (io, socket) {
         var col = msg.position.charAt(1);      // can have y field in msg object
         var loc = row * 3 + col * 3;
         // check room validity
-        var thisRoom;
         Room.findOne({name: msg.current}, function (err, roomResult) {
-            if (!err) {
-                thisRoom = roomResult;
+            if (!err && roomResult) {
 //                           console.log("socket room: " + socket.rooms);
-//                           console.log({"thisRoom: " : thisRoom});
+//                           console.log({"roomResult: " : roomResult});
 //                           console.log({"all rooms: ": rooms});
-                if (socket.username !== thisRoom.turn) {
+                if (socket.username !== roomResult.turn) {
                     socket.emit("chat:receive", {
                         chat: msg.current,
                         user: "System",
@@ -77,7 +75,7 @@ module.exports = function (io, socket) {
                     });
                     //              socket.emit("change turn");
                 } else {
-                    if (thisRoom.board[loc] === 1) {
+                    if (roomResult.board[loc] === 1) {
                         socket.emit("chat:receive", {
                             chat: msg.current,
                             user: "System",
@@ -97,12 +95,14 @@ module.exports = function (io, socket) {
                                     var imgPath = path.join(__dirname, "../public" + cardResult.picture);
                                     io.to(msg.current).emit("game:updateBoard", cardResult.picture, msg.position);
                                     //              io.to(socket.rooms[1]).emit("change turn");
-                                    if (thisRoom.turn === thisRoom.player1) {
-                                        thisRoom.turn = thisRoom.player2;
+                                    if (roomResult.turn === roomResult.player1) {
+                                        roomResult.turn = roomResult.player2;
                                     } else {
-                                        thisRoom.turn = thisRoom.player1;
+                                        roomResult.turn = roomResult.player1;
                                     }
-                                    thisRoom.board[loc] = 1;
+                                    roomResult.board[loc] = 1;
+                                    roomResult.markModified("board");
+                                    roomResult.save();
                                 } else {
                                     // invalid card
                                     socket.emit("chat:recieve", {
