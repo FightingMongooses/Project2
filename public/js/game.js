@@ -14,6 +14,11 @@ var game = {
             socket.emit("game:placeCard", {card:card, position:m});
 //            socket.emit("change turn");
         });
+        $("a#gameJoin").click(function(event){
+            event.preventDefault();
+            socket.emit("game:connect",{token:user.info.token});
+            $("a#gameJoin").parent().addClass("hidden");
+        });
         // Socket event capturing
         socket.on("game:updateBoard", function(data, pos){ // Place card on x/y
             var posi = "#pos" + pos;

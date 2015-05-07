@@ -155,12 +155,12 @@ module.exports = function (io,socket) {
                         if (err) { // Unknown error
                             socket.emit("user:signinError", {password: true});
                         } else if (match) { // Password matches, send JWT Token
-                            var token = tokenGenerator(result._id,result.email,socket.id);
                             socket.emit("user:accountInfo",{id:result._id,email:result.email,displayname:result.displayname});
                             //socket.emit("user:setToken", {token: token});
                             if(typeof result.displayname === "undefined"){
                                 socket.emit("user:trigger", {settings: true});
                             }
+                            var token = tokenGenerator(result._id,result.email,socket.id,result.displayname);
                         } else { // Password doesn't match
                             socket.emit("user:signinError", {password: true});
                         }
@@ -178,6 +178,7 @@ module.exports = function (io,socket) {
             var User = mongoose.model("User");
             User.findOneAndUpdate({"email": msg.email}, {displayname: msg.displayname},function(err,entry){
                 console.log({entry:entry});
+                var token = tokenGenerator(entry._id,entry.email,socket.id,entry.displayname);
                 socket.emit("user:trigger", {settings: false});
             });
 

@@ -186,7 +186,7 @@ var user = {
             $(".guest").addClass("hidden");
             $(".user").removeClass("hidden");
             $("input").parent().removeClass("has-error");
-            socket.emit("game:connect",{token:user.info.token});
+//            socket.emit("game:connect",{token:user.info.token});
         });
         socket.on("user:accountInfo",function(msg){
             console.log({msg:msg});

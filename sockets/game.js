@@ -119,14 +119,37 @@ module.exports = function (io,socket) {
         if(decode){
             socket.username = decode.displayname;
             // User connected
-            socket.emit("chat:receive", {chat:socket.rooms[1], user:"System", text: "You are connected", timestamp:Date()});
+            //socket.emit("chat:receive", {chat:socket.rooms[1], user:"System", text: "You are connected", timestamp:Date()});
+
+            Room.findOne({player2: null}, function(err, result){
+                if(result) {
+                    result.player2 = decode.displayname;
+                    result.turn = result.player1;
+                    socket.join(result.name);
+                    result.save();
+                    socket.emit("chat:receive",{chat:result.name, user:"System", text:"You are connected to " + result.name + " as player 2", timestamp:Date()});
+                }else{
+                    var room = new Room({
+                        name:"game" + numRooms,
+                        player1:decode.displayname,
+                        player2:null,
+                        turn: null,
+                        board:[0,0,0,0,0,0,0,0,0]
+                    });
+                    numRooms= numRooms+1;
+                    socket.join(room.name);
+                    room.save();
+                    socket.emit("chat:receive",{chat:room.name, user:"System", text:"You are connected to " + room.name + " as player 1", timestamp:Date()});
+                }
+
+            });
+            /*
             io.to(lobby).emit("chat:receive", {chat:socket.rooms[1], user:"System", text: decode.displayname + " connected", timestamp:Date()});
             // Join game lobby
             socket.join(lobby);
             // When another user joins, leave lobby, both join new room
             var clients = findClientsSocket(lobby);
               console.log(clients);
-            
             if(clients.length === 1){
                 // create new room object
               var room = new Room({
@@ -148,7 +171,7 @@ module.exports = function (io,socket) {
                 // increase room counter and start turn swapping
                 numRooms = numRooms +1;
                 clients[0].emit("change turn");
-            }
+            }*/
         }else{
               // warn client they aren't connected
         }

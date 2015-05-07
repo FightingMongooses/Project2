@@ -24,12 +24,12 @@ var chat = {
             },
 */
             open: function(event,ui){
-                socket.emit("chat:join",{room:"global",token:user.info.token});
+//                socket.emit("chat:join",{room:"global",token:user.info.token});
             },
             close: function() {
                 // Clear current message too
                 chat.modal.global.dialog( "close" );
-                socket.emit("chat:leave",{room:"global",token:user.info.token});
+//                socket.emit("chat:leave",{room:"global",token:user.info.token});
             }
         })
     },
