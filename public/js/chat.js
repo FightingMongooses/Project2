@@ -68,7 +68,7 @@ var chat = {
                     )
                 );
                 // TODO Make this autoscroll to bottom of modal pop-up since messages are appended here
-                $('.chat#chatGlobal')[0].scrollTop = $('.chat#chatGlobal')[0].scrollHeight;
+                $(".chat#chatGlobal")[0].scrollTop = $(".chat#chatGlobal")[0].scrollHeight;
                 // The input field and button still scroll with it, those need to be put somewhere else.
             } else if (msg.chat.startsWith("Game")) {
                 game.current = msg.chat;
@@ -79,7 +79,7 @@ var chat = {
                     )
                 );
                 // TODO Make this autoscroll to bottom of modal pop-up since messages are appended here
-                $('.chat#chatGame')[0].scrollTop = $('.chat#chatGame')[0].scrollHeight;
+                $(".chat#chatGame")[0].scrollTop = $(".chat#chatGame")[0].scrollHeight;
             }
         });
     }

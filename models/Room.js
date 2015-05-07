@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(mongoose){
+module.exports = function (mongoose) {
 
     // Actual Schema
     var Room = new mongoose.Schema({
@@ -10,6 +10,6 @@ module.exports = function(mongoose){
         turn: String,
         board: [Number]
     });
-    
+
     return Room;
 };

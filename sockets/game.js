@@ -63,9 +63,6 @@ module.exports = function (io, socket) {
         // check room validity
         Room.findOne({name: msg.current}, function (err, roomResult) {
             if (!err && roomResult) {
-//                           console.log("socket room: " + socket.rooms);
-//                           console.log({"roomResult: " : roomResult});
-//                           console.log({"all rooms: ": rooms});
                 if (socket.username !== roomResult.turn) {
                     socket.emit("chat:receive", {
                         chat: msg.current,
@@ -84,15 +81,8 @@ module.exports = function (io, socket) {
                         });
                     } else {
                         // check card validity
-                        var data;
-                        var exists = true;
-                        console.log(msg.card);
-
-
-                        // until then...
                         Card.findOne({title: msg.card}, function (err, cardResult) {
                                 if (!err && cardResult) {
-                                    var imgPath = path.join(__dirname, "../public" + cardResult.picture);
                                     io.to(msg.current).emit("game:updateBoard", cardResult.picture, msg.position);
                                     //              io.to(socket.rooms[1]).emit("change turn");
                                     if (roomResult.turn === roomResult.player1) {

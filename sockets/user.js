@@ -33,13 +33,13 @@ module.exports = function (io, socket) {
             }
         };
 
-        console.log({isValidToken: decoded});
+        //console.log({isValidToken: decoded});
         if (decoded === null || typeof decoded.sockets === "undefined") { // Token error of some sort
-            console.log({isValidToken: "Error, decoded null or undefined", decoded: decoded});
+            //console.log({isValidToken: "Error, decoded null or undefined", decoded: decoded});
             socket.emit("user:signinError", {token: true}); // Run token delete command client-side
             return false;
         } else if (decoded.sockets.indexOf(thisSocket) > -1) { // Sockets match, no need to verify further since token passed as valid
-            console.log({isValidToken: "This socket is in the token list", decoded: decoded});
+            //console.log({isValidToken: "This socket is in the token list", decoded: decoded});
             return decoded;
         } else { // Current socket not listed in token, verify by IP for now
             // Token socket garbage collection(Trim dead sockets from decoded list)
@@ -71,7 +71,7 @@ module.exports = function (io, socket) {
             allSockets = _.unique(userSockets);
         }
         allSockets = allSockets.filter(checkSocketLive);
-        console.log({userSockets: allSockets, what: typeof allSockets});
+        //console.log({userSockets: allSockets, what: typeof allSockets});
         var token = jwt.sign(
             {id: userId, email: userEmail, displayname: userDisplayname, sockets: allSockets},
             secret,
@@ -80,7 +80,7 @@ module.exports = function (io, socket) {
         // REF: http://stackoverflow.com/a/24722062 <-- for socket.io > 1.0
         allSockets.forEach(function (element, index, array) { // Send this message to all sockets in this list
             //socket.emit("user:setToken", {token: token});
-            console.log({token: token, element: element});
+            //console.log({token: token, element: element});
             io.to(element).emit("user:setToken", {token: token});
         });
         return token;
@@ -94,13 +94,13 @@ module.exports = function (io, socket) {
         if (msg.token !== null) {
             var decode = validator.isValidToken(msg.token);
             if (decode !== false) { // Token is valid, we have data
-                console.log({decode: decode});
+                //console.log({decode: decode});
                 var User = mongoose.model("User");
                 User.findOne({email: decode.email}, function (err, result) {
                     if (result) { // If user was found
                         decode.sockets.push(socket.id);
                         var token = tokenGenerator(result._id, result.email, decode.sockets, result.displayname);
-                        console.log({id: result._id, email: result.email, token: token});
+                        //console.log({id: result._id, email: result.email, token: token});
                         socket.emit("user:accountInfo", {
                             id: result._id,
                             email: result.email,
@@ -120,7 +120,7 @@ module.exports = function (io, socket) {
         }
     });
     socket.on("user:register", function (msg) {
-        console.log({action: "register", msg: msg});
+        //console.log({action: "register", msg: msg});
         if (validator.isEmail(msg.email)) {
             // Check if user exist in DB
             var User = mongoose.model("User");
@@ -132,7 +132,7 @@ module.exports = function (io, socket) {
                     });
                     create.save();
                     var token = tokenGenerator(create._id, create.email, socket.id);
-                    console.log({id: create._id, email: create.email, token: token});
+                    //console.log({id: create._id, email: create.email, token: token});
                     socket.emit("user:accountInfo", {
                         id: create._id,
                         email: create.email,
@@ -149,7 +149,7 @@ module.exports = function (io, socket) {
         }
     });
     socket.on("user:signin", function (msg) {
-        console.log({action: "signin", msg: msg});
+        //console.log({action: "signin", msg: msg});
         if (validator.isEmail(msg.email)) {
             // Attempt login
             var User = mongoose.model("User");
@@ -182,10 +182,19 @@ module.exports = function (io, socket) {
     socket.on("user:settings", function (msg) {
 
         if (validator.isAlphanumeric(msg.displayname) && validator.isEmail(msg.email)) {
-            console.log({action: "settings", msg: msg});
+            //console.log({action: "settings", msg: msg});
             var User = mongoose.model("User");
-            User.findOneAndUpdate({"email": msg.email}, {displayname: msg.displayname}, function (err, entry) {
-                console.log({entry: entry});
+            User.findOne({"email": msg.email}).exec(function (err, entry) {
+                //console.log({entry: entry});
+                socket.emit("chat:receive", {
+                    chat: "global",
+                    user: "System",
+                    text: "User "+entry.displayname+" has changed their name to "+msg.displayname+".",
+                    timestamp: Date()
+                });
+                entry.displayname=msg.displayname;
+                entry.markModified("displayname");
+                entry.save();
                 var token = tokenGenerator(entry._id, entry.email, socket.id, entry.displayname);
                 socket.emit("user:trigger", {settings: false});
             });
@@ -195,7 +204,7 @@ module.exports = function (io, socket) {
         }
     });
     socket.on("user:changepassword", function (msg) {
-        console.log({action: "changepassword", msg: msg});
+        //console.log({action: "changepassword", msg: msg});
         if (msg.newpassword === msg.confirmpassword && msg.newpassword !== msg.oldpassword) { // new + confirm passwords match, and don't match oldpassword
             if (validator.isValidToken(msg.token)) { // Check token is valid
                 var User = mongoose.model("User");
@@ -223,9 +232,9 @@ module.exports = function (io, socket) {
     socket.on("user:logout", function (msg) {
         var decode = validator.isValidToken(msg.token);
         if (decode !== false) { // Token is valid, we have data
-            console.log({action: "logout", msg: msg});
+            //console.log({action: "logout", msg: msg});
             decode.sockets.forEach(function (element, index, array) { // logging all active sockets out from this user
-                console.log({token: msg.token, element: element});
+                //console.log({token: msg.token, element: element});
                 io.to(element).emit("user:signinError", {token: true}); // Tell all sockets to clear their tokens(which logs them out)
             });
         }

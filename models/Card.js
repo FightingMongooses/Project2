@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(mongoose){
+module.exports = function (mongoose) {
 
     // Actual Schema
     var Card = new mongoose.Schema({
