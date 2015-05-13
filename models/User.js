@@ -11,7 +11,7 @@ module.exports = function (mongoose) {
         password: {type: String, required: true},
         wins: {type: Number, default: 0},
         losses: {type: Number, default: 0},
-//        deck: [{type: mongoose.Schema.Types.ObjectId, ref: "Card"}],
+        deck: [{type: mongoose.Schema.Types.ObjectId, ref: "Card"}],
         friends: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
         created_on: {type: Date},
         updated_on: {type: Date}

@@ -1,5 +1,5 @@
 "use strict";
-
+var random = require('mongoose-simple-random');
 module.exports = function (mongoose) {
 
     // Actual Schema
@@ -12,5 +12,6 @@ module.exports = function (mongoose) {
         right: Number
     });
 
+    Card.plugin(random);
     return Card;
 };
