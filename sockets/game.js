@@ -23,6 +23,7 @@ module.exports = function (io, socket) {
                 if (roomResult) {
                     roomResult.player2 = decode.displayname;
                     roomResult.turn = roomResult.player1;
+                    roomResult.state = "inprogess";
                     socket.join(roomResult.name);
                     roomResult.save();
                     socket.emit("chat:receive", {
@@ -37,7 +38,8 @@ module.exports = function (io, socket) {
                         player1: decode.displayname,
                         player2: null,
                         turn: null,
-                        board: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                        board: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        state: "pending"
                     });
                     room.name = "Game" + room._id;
                     socket.join(room.name);

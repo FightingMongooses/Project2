@@ -8,7 +8,8 @@ module.exports = function (mongoose) {
         player1: String,
         player2: String,
         turn: String,
-        board: [Number]
+        board: [Number],
+        state: String
     });
 
     return Room;
