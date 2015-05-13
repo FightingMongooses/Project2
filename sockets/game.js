@@ -20,8 +20,10 @@ module.exports = function (io, socket) {
             //socket.emit("chat:receive", {chat:socket.rooms[1], user:"System", text: "You are connected", timestamp:Date()});
 
             Room.findOne({player2: null}, function (err, roomResult) {
+                Card.findRandom({},{},{limit:5},function(err, cardResult){
                 if (roomResult) {
                     roomResult.player2 = decode.displayname;
+                                roomResult.hands.player2 = cardResult;
                     roomResult.turn = roomResult.player1;
                     roomResult.state = "inprogess";
                     socket.join(roomResult.name);
@@ -38,7 +40,13 @@ module.exports = function (io, socket) {
                         player1: decode.displayname,
                         player2: null,
                         turn: null,
-                        board: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                        board: {
+                                        card:[null, null, null, null, null, null, null, null, null],
+                                        owner:[null, null, null, null, null, null, null, null, null]
+                                        },
+                                        hands:{
+                                        player1:cardResult;
+                                        }
                         state: "pending"
                     });
                     room.name = "Game" + room._id;
@@ -52,6 +60,7 @@ module.exports = function (io, socket) {
                     });
                 }
             });
+            });
         } else {
             // warn client they aren"t connected
         }
@@ -59,9 +68,9 @@ module.exports = function (io, socket) {
     socket.on("game:placeCard", function (msg) { //Handle placing the card on the board
         // check position for collision
 //              console.log(msg);
-        var row = msg.position.charAt(0);      // can have x field in msg object
-        var col = msg.position.charAt(1);      // can have y field in msg object
-        var loc = row * 3 + col * 3;
+//        var row = msg.position.charAt(0);      // can have x field in msg object
+//        var col = msg.position.charAt(1);      // can have y field in msg object
+        var loc = msg.position;
         // check room validity
         Room.findOne({name: msg.current}, function (err, roomResult) {
             if (!err && roomResult) {
@@ -83,16 +92,35 @@ module.exports = function (io, socket) {
                         });
                     } else {
                         // check card validity
-                        Card.findOne({title: msg.card}, function (err, cardResult) {
+                        Card.findOne({title: msg.card.name}, function (err, cardResult) {
                                 if (!err && cardResult) {
-                                    io.to(msg.current).emit("game:updateBoard", cardResult.picture, msg.position);
+                                     // check adjacent positions
+                                     //up
+                                     var up = loc-3;
+                                     var down = loc+3;
+                                     var left = loc-1;
+                                     var right = loc+1;
+                                     if(up >= 0 && up <= 8 && roomResult.board.card[up] != null){
+                                        if(roomResult.board.card[up].down < cardResult.up){
+                                            roomResult.board.owner[up] = socket.username);
+                                        }
+                                     }
+                     
                                     //              io.to(socket.rooms[1]).emit("change turn");
+                                    roomResult.board.card[loc] = msg.card;
+                                    roomResult.board.owner[loc]= roomResult.turn
                                     if (roomResult.turn === roomResult.player1) {
                                         roomResult.turn = roomResult.player2;
+                                        roomResult.hands.player1 = roomResult.hands.player1.filter(function(element){
+                                            return element.title !== msg.card.name;
+                                        });    // remove the card
                                     } else {
                                         roomResult.turn = roomResult.player1;
+                                        roomResult.hands.player2 = roomResult.hands.player2.filter(function(element){
+                                            return element.title !== msg.card.name;
+                                        });    // remove the card
                                     }
-                                    roomResult.board[loc] = 1;
+                                    io.to(msg.current).emit("game:updateBoard", {board: roomResult.board, hands: roomResult.hands});
                                     roomResult.markModified("board");
                                     roomResult.save();
                                 } else {
