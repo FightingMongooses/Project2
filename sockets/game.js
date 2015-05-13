@@ -18,49 +18,56 @@ module.exports = function (io, socket) {
             socket.username = decode.displayname;
             // User connected
             //socket.emit("chat:receive", {chat:socket.rooms[1], user:"System", text: "You are connected", timestamp:Date()});
-
-            Room.findOne({player2: null}, function (err, roomResult) {
-                Card.findRandom({}, {}, {limit: 5}, function (err, cardResult) {
-                    if (roomResult) {
-                        roomResult.player2 = decode.displayname;
-                        roomResult.hands.player2 = cardResult;
-                        roomResult.turn = roomResult.player1;
-                        roomResult.state = "inprogess";
-                        socket.join(roomResult.name);
-                        roomResult.save();
-                        socket.emit("chat:receive", {
-                            chat: roomResult.name,
-                            user: "System",
-                            text: "You are connected to " + roomResult.name + " as player 2",
-                            timestamp: Date()
-                        });
-                    } else {
-                        var room = new Room({
-                            name: "newGame" + Math.floor(new Date() / 1000), // To ensure the temporary name is unique
-                            player1: decode.displayname,
-                            player2: null,
-                            turn: null,
-                            board: {
-                                card: [null, null, null, null, null, null, null, null, null],
-                                owner: [null, null, null, null, null, null, null, null, null]
-                            },
-                            hands: {
-                                player1: cardResult
-                            },
-                            state: "pending"
-                        });
-                        room.name = "Game" + room._id;
-                        socket.join(room.name);
-                        room.save();
-                        socket.emit("chat:receive", {
-                            chat: room.name,
-                            user: "System",
-                            text: "You are connected to " + room.name + " as player 1",
-                            timestamp: Date()
-                        });
-                    }
-                });
-            });
+              Room.findOne({$or:[{player1:socket.username}, {player2:socket.username}]}, function(err, result){
+                           if(!err && !result){
+                           Room.findOne({player2: null}, function (err, roomResult) {
+                                        Card.findRandom({}, {}, {limit: 5}, function (err, cardResult) {
+                                                        if (roomResult) {
+                                                        roomResult.player2 = decode.displayname;
+                                                        roomResult.hands.player2 = cardResult;
+                                                        roomResult.turn = roomResult.player1;
+                                                        roomResult.state = "inprogess";
+                                                        socket.join(roomResult.name);
+                                                        roomResult.save();
+                                                        socket.emit("chat:receive", {
+                                                                    chat: roomResult.name,
+                                                                    user: "System",
+                                                                    text: "You are connected to " + roomResult.name + " as player 2",
+                                                                    timestamp: Date()
+                                                                    });
+                                                        } else {
+                                                        var room = new Room({
+                                                                            name: "newGame" + Math.floor(new Date() / 1000), // To ensure the temporary name is unique
+                                                                            player1: decode.displayname,
+                                                                            player2: null,
+                                                                            turn: null,
+                                                                            board: {
+                                                                            card: [null, null, null, null, null, null, null, null, null],
+                                                                            owner: [null, null, null, null, null, null, null, null, null]
+                                                                            },
+                                                                            hands: {
+                                                                            player1: cardResult
+                                                                            },
+                                                                            state: "pending"
+                                                                            });
+                                                        room.name = "Game" + room._id;
+                                                        socket.join(room.name);
+                                                        room.save();
+                                                        socket.emit("chat:receive", {
+                                                                    chat: room.name,
+                                                                    user: "System",
+                                                                    text: "You are connected to " + room.name + " as player 1",
+                                                                    timestamp: Date()
+                                                                    });
+                                                        }
+                                                        });
+                                        });
+                           }
+                           else if(result){
+                           console.log("player tried to join two games.");
+                           }
+                           });
+            
         } else {
             // warn client they aren"t connected
         }
