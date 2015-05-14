@@ -16,6 +16,7 @@ module.exports = function (io, socket) {
                 io.to(currentRoom.name).emit("game:updateBoard", {
                     board: currentRoom.board,
                     hands: currentRoom.hands,
+                    turn: currentRoom.turn,
                     players: {player1: currentRoom.player1, player2: currentRoom.player2}
                 });
             });

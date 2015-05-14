@@ -2,7 +2,8 @@
 var game = {
     current: null,
     info: {
-        players: null
+        players: null,
+        turn: null
     },
 
     board: {
@@ -12,20 +13,35 @@ var game = {
         load: function (board) { // Load current state of game
             for (var i = 0; i < 9; i++) {
                 if (board.card[i] !== null && board.card[i].title !== "Placeholder") {
+                    var cardOwner = null;
+                    if(board.owner[i] === game.info.players.player1){
+                        cardOwner = "player1card";
+                    } else {
+                        cardOwner = "player2card";
+                    }
                     console.log({card: board.card[i]});
                     $("<div></div>")
-                        .data("number", i).css("background-image", "url(" + board.card[i].picture + ")")
+                        .data("number", i).addClass(cardOwner).css("background-image", "url(" + board.card[i].picture + ")")
                         .appendTo("#cardSlots")
                         .droppable();
                 } else {
-                    $("<div></div>")
-                        .data("number", i)
-                        .appendTo("#cardSlots")
-                        .droppable({
-                            accept: "#cardPile1 div, #cardPile2 div",
-                            hoverClass: "hovered",
-                            drop: handleCardDrop
-                        });
+                    var dropableConfig = {
+                        drop: handleCardDrop,
+                        accept: "#cardPile1 div, #cardPile2 div",
+                        hoverClass: "hovered"
+                    };
+                    if(game.info.turn !== user.info.displayname){
+                        dropableConfig = {};
+                        $("<div></div>")
+                            .data("number", i)
+                            .appendTo("#cardSlots")
+                            .droppable(dropableConfig);
+                    } else {
+                        $("<div></div>")
+                            .data("number", i)
+                            .appendTo("#cardSlots")
+                            .droppable(dropableConfig);
+                    }
                 }
             }
         },
@@ -85,6 +101,7 @@ var game = {
             console.log({updateBoard: data});
             $("a#gameJoin").parent().addClass("hidden");
             game.info.players = data.players;
+            game.info.turn = data.turn
 //            console.log({game:game.info.players,data:data.players});
             //TODO
             game.cards.wipe();
