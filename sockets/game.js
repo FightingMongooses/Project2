@@ -46,7 +46,8 @@ module.exports = function (io, socket) {
                         }
                     ]
                 })
-                .populate("hands.player1 hands.player2 board.card").exec(function (err, result) {
+                .populate("hands.player1 hands.player2 board.card")
+                .exec(function (err, result) {
                     console.log({result: result});
                     if (!err && !result) {
                         Room.findOne({player2: null})

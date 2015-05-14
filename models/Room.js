@@ -24,7 +24,7 @@ module.exports = function (mongoose) {
         var player2score = 0;
         var entry = this;
         entry.board.owner.forEach(function (owner) {
-            if(entry.player1 !== null && entry.player2 !== null) {
+            if (entry.player1 !== null && entry.player2 !== null) {
                 if (owner === entry.player1) {
                     player1score += 1;
                 } else if (owner === entry.player2) {

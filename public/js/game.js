@@ -15,7 +15,7 @@ var game = {
             for (var i = 0; i < 9; i++) {
                 if (board.card[i] !== null && board.card[i].title !== "Placeholder") {
                     var cardOwner = null;
-                    if(board.owner[i] === game.info.players.player1){
+                    if (board.owner[i] === game.info.players.player1) {
                         cardOwner = "player1card";
                     } else {
                         cardOwner = "player2card";
@@ -32,7 +32,7 @@ var game = {
                         accept: "#cardPile1 div, #cardPile2 div",
                         hoverClass: "hovered"
                     };
-                    if(game.info.turn !== user.info.displayname){
+                    if (game.info.turn !== user.info.displayname) {
                         dropableConfig = {};
                         $("<div></div>")
                             .data("number", i)
@@ -72,7 +72,7 @@ var game = {
                     }
                     $("<div></div>")
                         .data("number", cards[i]).css("background-image", "url(" + cards[i].picture + ")")
-                        .attr("class", "player" + player.toString()+"card")
+                        .attr("class", "player" + player.toString() + "card")
                         .appendTo("#cardPile" + player.toString()).draggable(config);
                 }
             }
@@ -113,8 +113,8 @@ var game = {
             game.cards.load(2, data.hands.player2);
             game.board.load(data.board);
             console.log(data);
-            if(game.info.state === "complete" && data.winner !== null){
-                alert("Game over, winner was "+data.winner);
+            if (game.info.state === "complete" && data.winner !== null) {
+                alert("Game over, winner was " + data.winner);
                 $("a#gameJoin").parent().removeClass("hidden");
             }
         });
