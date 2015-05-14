@@ -54,7 +54,7 @@ var game = {
                     }
                     $("<div></div>")
                         .data("number", cards[i]).css("background-image", "url(" + cards[i].picture + ")")
-                        .attr("id", "player" + player.toString())
+                        .attr("class", "player" + player.toString()+"card")
                         .appendTo("#cardPile" + player.toString()).draggable(config);
                 }
             }
