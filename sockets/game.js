@@ -64,6 +64,8 @@ module.exports = function (io, socket) {
                                         });
                            }
                            else if(result){
+                           socket.join(result.name);
+                           io.to(result.name).emit("game:updateBoard",{board:result.board, hands: result.hands});
                            console.log("player tried to join two games.");
                            }
                            });
