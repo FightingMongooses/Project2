@@ -47,7 +47,8 @@ module.exports = function (io, socket) {
                                 });
                                 io.to(roomResult.name).emit("game:updateBoard", {
                                     board: roomResult.board,
-                                    hands: roomResult.hands
+                                    hands: roomResult.hands,
+                                    players: {player1: roomResult.player1, player2: roomResult.player2}
                                 });
                             } else {
                                 var room = new Room({
@@ -78,7 +79,8 @@ module.exports = function (io, socket) {
                                     board: room.board,
                                     hands: {
                                         player1: cardResult
-                                    }
+                                    },
+                                    players: {player1: room.player1, player2: room.player2}
                                 });
                             }
                         });
@@ -86,7 +88,13 @@ module.exports = function (io, socket) {
                 }
                 else if (result) {
                     socket.join(result.name);
-                    io.to(result.name).emit("game:updateBoard", {board: result.board, hands: result.hands});
+                    socket.emit("chat:receive", {
+                        chat: result.name,
+                        user: "System",
+                        text: "You are connected to " + result.name,
+                        timestamp: Date()
+                    });
+                    io.to(result.name).emit("game:updateBoard", {board: result.board, hands: result.hands,players: {player1: result.player1, player2: result.player2}});
                     console.log("player tried to join two games.");
                 }
             });
@@ -122,7 +130,7 @@ module.exports = function (io, socket) {
                         });
                     } else {
                         // check card validity
-                        Card.findOne({title: msg.card.name}, function (err, cardResult) {
+                        Card.findOne({title: msg.card.title}, function (err, cardResult) {
                                 if (!err && cardResult) {
                                     // check adjacent positions
                                     //up
@@ -153,16 +161,16 @@ module.exports = function (io, socket) {
 
                                     //              io.to(socket.rooms[1]).emit("change turn");
                                     roomResult.board.card[loc] = msg.card;
-                                    roomResult.board.owner[loc] = roomResult.turn
+                                    roomResult.board.owner[loc] = roomResult.turn;
                                     if (roomResult.turn === roomResult.player1) {
                                         roomResult.turn = roomResult.player2;
                                         roomResult.hands.player1 = roomResult.hands.player1.filter(function (element) {
-                                            return element.title !== msg.card.name;
+                                            return element.toString() !== msg.card._id.toString();
                                         });    // remove the card
                                     } else {
                                         roomResult.turn = roomResult.player1;
                                         roomResult.hands.player2 = roomResult.hands.player2.filter(function (element) {
-                                            return element.title !== msg.card.name;
+                                            return element.toString() !== msg.card._id.toString();
                                         });    // remove the card
                                     }
                                     io.to(msg.current).emit("game:updateBoard", {
@@ -170,6 +178,7 @@ module.exports = function (io, socket) {
                                         hands: roomResult.hands
                                     });
                                     roomResult.markModified("board");
+                                    roomResult.markModified("hands");
                                     roomResult.save();
                                 } else {
                                     // invalid card

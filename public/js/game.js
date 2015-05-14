@@ -1,12 +1,12 @@
 "use strict";
 var game = {
-    current: {
-        correctCards: 0
+    current : null,
+    info: {
+        players: null
     },
 
     board: {
         wipe: function () { // Wipe the board for a new game
-            game.current.correctCards = 0;
             $("#cardSlots").html("");
         },
         load: function (board) { // Load current state of game
@@ -32,8 +32,8 @@ var game = {
                 }
             }
         },
-        play: function(){
-
+        play: function(position,card){
+            socket.emit("game:placeCard", {card: card, position: position, current: game.current});
         }
     },
     cards: {
@@ -43,15 +43,21 @@ var game = {
         },
         load: function (player, cards) { // Load each players cards
             for (var i = 0; i < cards.length; i++) {
+                var config = {
+                    containment: "#gameBoard",
+                    stack: "#cardPile" + player.toString() + " div",
+                    cursor: "move",
+                    revert: true
+                };
+                if(game.info.players.player1 === user.info.displayname && player !== 1) {
+                    config.disabled = true;
+                } else if(game.info.players.player2 === user.info.displayname && player !== 2){
+                    config.disabled = true;
+                }
                 $("<div><img src=\"" + cards[i].picture + "\"></div>")
                     .data("number", cards[i])
                     .attr("id", "player" + player.toString())
-                    .appendTo("#cardPile" + player.toString()).draggable({
-                        containment: "#content",
-                        stack: "#cardPile" + player.toString() + " div",
-                        cursor: "move",
-                        revert: true
-                    });
+                    .appendTo("#cardPile" + player.toString()).draggable(config);
             }
         }
     },
@@ -79,6 +85,7 @@ var game = {
         // Socket event capturing
         socket.on("game:updateBoard", function (data) { // Revise board
             console.log({updateBoard: data});
+            game.info.players = data.players;
             //TODO
             game.cards.wipe();
             game.board.wipe();
@@ -94,9 +101,10 @@ var game = {
     }
 };
 function handleCardDrop(event, ui) {
-    var slotNumber = $(this).data("number");
+    var position = $(this).data("number");
     var cardData = ui.draggable.data("number");
 
+    game.board.play(position,cardData);
     // If the card was dropped to the correct slot,
     // change the card colour, position it directly
     // on top of the slot, and prevent it being dragged
@@ -108,24 +116,10 @@ function handleCardDrop(event, ui) {
     $(this).droppable("disable");
     ui.draggable.position({of: $(this), my: "left top", at: "left top"});
     ui.draggable.draggable("option", "revert", false);
-    correctCards++;
     //}
 
-    socket.emit("game:placeCard", {card: cardData, position: slotNumber, current: game.current});
     // If all the cards have been placed correctly then display a message
     // and reset the cards for another go
-
-    if (game.current.correctCards === 9) {
-        $("#successMessage").show();
-        $("#successMessage").animate({
-            left: "380px",
-            top: "200px",
-            width: "400px",
-            height: "100px",
-            opacity: 1
-        });
-    }
-
 }
 
 $(document).ready(function () {
