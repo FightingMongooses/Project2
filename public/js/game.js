@@ -11,11 +11,14 @@ var game = {
         },
         load: function (board) { // Load current state of game
             for (var i = 0; i < 9; i++) {
-                $("<div>" + board[i] + "</div>").data("number", i).appendTo("#cardSlots").droppable({
-                    accept: "#cardPile1 div, #cardPile2 div",
-                    hoverClass: "hovered",
-                    drop: handleCardDrop
-                });
+                $("<div>" + board[i] + "</div>")
+                    .data("number", i)
+                    .appendTo("#cardSlots")
+                    .droppable({
+                        accept: "#cardPile1 div, #cardPile2 div",
+                        hoverClass: "hovered",
+                        drop: handleCardDrop
+                    });
             }
         }
     },
@@ -25,7 +28,7 @@ var game = {
             $("#cardPile2").html("");
         },
         load: function (player, cards) { // Load each players cards
-            for(var i=0;i<cards.length;i++) {
+            for (var i = 0; i < cards.length; i++) {
                 $("<div>" + cards[i].title + "</div>")
                     .data("number", cards[i])
                     .attr("id", "player" + player.toString())
@@ -58,14 +61,14 @@ var game = {
             $("a#gameJoin").parent().addClass("hidden");
             game.board.wipe();
             game.cards.wipe();
-            game.board.load();
         });
         // Socket event capturing
         socket.on("game:updateBoard", function (data) { // Revise board
+            console.log({updateBoard: data});
             //TODO
             game.cards.wipe();
-            game.cards.load(1,data.hands.player1);
-            game.cards.load(2,data.hands.player2);
+            game.cards.load(1, data.hands.player1);
+            game.cards.load(2, data.hands.player2);
             // OLD
             var posi = "#pos" + pos;
             var img = "img" + pos;
