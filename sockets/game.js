@@ -130,22 +130,22 @@ module.exports = function (io, socket) {
                                     var down = loc + 3;
                                     var left = loc - 1;
                                     var right = loc + 1;
-                                    if (up >= 0 && up <= 8 && roomResult.board.card[up] != null) {
+                                    if (up >= 0 && up <= 8 && roomResult.board.card[up] !== null) {
                                         if (roomResult.board.card[up].down < cardResult.up) {
                                             roomResult.board.owner[up] = socket.username;
                                         }
                                     }
-                                    if (down >= 0 && down <= 8 && roomResult.board.card[down] != null) {
+                                    if (down >= 0 && down <= 8 && roomResult.board.card[down] !== null) {
                                         if (roomResult.board.card[down].up < cardResult.down) {
                                             roomResult.board.owner[down] = socket.username;
                                         }
                                     }
-                                    if (left >= 0 && left <= 8 && roomResult.board.card[left] != null) {
+                                    if (left >= 0 && left <= 8 && roomResult.board.card[left] !== null) {
                                         if (roomResult.board.card[left].right < cardResult.left) {
                                             roomResult.board.owner[left] = socket.username;
                                         }
                                     }
-                                    if (right >= 0 && up <= 8 && roomResult.board.card[right] != null) {
+                                    if (right >= 0 && up <= 8 && roomResult.board.card[right] !== null) {
                                         if (roomResult.board.card[right].left < cardResult.right) {
                                             roomResult.board.owner[right] = socket.username;
                                         }

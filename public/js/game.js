@@ -11,14 +11,25 @@ var game = {
         },
         load: function (board) { // Load current state of game
             for (var i = 0; i < 9; i++) {
-                $("<div>" + board[i] + "</div>")
-                    .data("number", i)
-                    .appendTo("#cardSlots")
-                    .droppable({
-                        accept: "#cardPile1 div, #cardPile2 div",
-                        hoverClass: "hovered",
-                        drop: handleCardDrop
-                    });
+                if(board[i] === null) {
+                    $("<div></div>")
+                        .data("number", i)
+                        .appendTo("#cardSlots")
+                        .droppable({
+                            accept: "#cardPile1 div, #cardPile2 div",
+                            hoverClass: "hovered",
+                            drop: handleCardDrop
+                        });
+                } else {
+                    $("<div>" + board[i] + "</div>")
+                        .data("number", i)
+                        .appendTo("#cardSlots")
+                        .droppable({
+                            accept: "#cardPile1 div, #cardPile2 div",
+                            hoverClass: "hovered",
+                            drop: handleCardDrop
+                        });
+                }
             }
         }
     },
