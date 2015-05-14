@@ -8,3 +8,6 @@ To run project:
 > npm install
 
 > npm start
+
+To view current project, it has been deployed to:
+> http://cpsc473.discard.xyz
