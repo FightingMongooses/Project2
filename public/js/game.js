@@ -11,7 +11,7 @@ var game = {
         },
         load: function (board) { // Load current state of game
             for (var i = 0; i < 9; i++) {
-                if(board[i] === null) {
+                if(board[i] === undefined) {
                     $("<div></div>")
                         .data("number", i)
                         .appendTo("#cardSlots")
@@ -31,6 +31,9 @@ var game = {
                         });
                 }
             }
+        },
+        play: function(){
+
         }
     },
     cards: {
