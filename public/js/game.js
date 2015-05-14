@@ -115,6 +115,7 @@ var game = {
             console.log(data);
             if(game.info.state === "complete" && data.winner !== null){
                 alert("Game over, winner was "+data.winner);
+                $("a#gameJoin").parent().removeClass("hidden");
             }
         });
     }
