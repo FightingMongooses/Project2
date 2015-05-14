@@ -17,6 +17,8 @@ module.exports = function (io, socket) {
                     board: currentRoom.board,
                     hands: currentRoom.hands,
                     turn: currentRoom.turn,
+                    state: currentRoom.state,
+                    winner: currentRoom.winner,
                     players: {player1: currentRoom.player1, player2: currentRoom.player2}
                 });
             });

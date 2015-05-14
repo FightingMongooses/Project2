@@ -3,7 +3,8 @@ var game = {
     current: null,
     info: {
         players: null,
-        turn: null
+        turn: null,
+        state: null
     },
 
     board: {
@@ -102,7 +103,8 @@ var game = {
             console.log({updateBoard: data});
             $("a#gameJoin").parent().addClass("hidden");
             game.info.players = data.players;
-            game.info.turn = data.turn
+            game.info.turn = data.turn;
+            game.info.state = data.state;
 //            console.log({game:game.info.players,data:data.players});
             //TODO
             game.cards.wipe();
@@ -110,9 +112,10 @@ var game = {
             game.cards.load(1, data.hands.player1);
             game.cards.load(2, data.hands.player2);
             game.board.load(data.board);
-        });
-        socket.on("game:complete",function(data){
-
+            console.log(data);
+            if(game.info.state === "complete" && data.winner !== null){
+                alert("Game over, winner was "+data.winner);
+            }
         });
     }
 };
