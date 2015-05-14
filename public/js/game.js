@@ -78,8 +78,10 @@ var game = {
             console.log({updateBoard: data});
             //TODO
             game.cards.wipe();
+            game.board.wipe();
             game.cards.load(1, data.hands.player1);
             game.cards.load(2, data.hands.player2);
+            game.board.load(data.board);
             // OLD
             var posi = "#pos" + pos;
             var img = "img" + pos;
