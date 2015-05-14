@@ -21,7 +21,8 @@ var game = {
                     }
                     console.log({card: board.card[i]});
                     $("<div></div>")
-                        .data("number", i).addClass(cardOwner).css("background-image", "url(" + board.card[i].picture + ")")
+                        .data("number", i).addClass(cardOwner)
+                        .css("background-image", "url(" + board.card[i].picture + ")")
                         .appendTo("#cardSlots")
                         .droppable();
                 } else {
