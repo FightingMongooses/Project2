@@ -18,9 +18,19 @@ module.exports = function (io, socket) {
             socket.username = decode.displayname;
             // User connected
             //socket.emit("chat:receive", {chat:socket.rooms[1], user:"System", text: "You are connected", timestamp:Date()});
-            Room.findOne({$or: [{player1: socket.username}, {player2: socket.username}]}, function (err, result) {
+            Room.findOne(
+                {$and: [
+                    {$or: [
+                        {player1: socket.username},
+                        {player2: socket.username}
+                    ]},
+                    {state: {$ne: "complete"}}
+                ]})
+                .populate("hands.player1 hands.player2 board.card").exec(function (err, result) {
+                    console.log({result:result});
                 if (!err && !result) {
-                    Room.findOne({player2: null}, function (err, roomResult) {
+                    Room.findOne({player2: null})
+                        .populate("hands.player1 hands.player2 board.card").exec(function (err, roomResult) {
                         Card.findRandom({}, {}, {limit: 5}, function (err, cardResult) {
                             if (roomResult) {
                                 roomResult.player2 = decode.displayname;
@@ -34,6 +44,10 @@ module.exports = function (io, socket) {
                                     user: "System",
                                     text: "You are connected to " + roomResult.name + " as player 2",
                                     timestamp: Date()
+                                });
+                                io.to(roomResult.name).emit("game:updateBoard", {
+                                    board: roomResult.board,
+                                    hands: roomResult.hands
                                 });
                             } else {
                                 var room = new Room({
@@ -50,6 +64,7 @@ module.exports = function (io, socket) {
                                     },
                                     state: "pending"
                                 });
+//                                room.hands.player1 = cardResult;
                                 room.name = "Game" + room._id;
                                 socket.join(room.name);
                                 room.save();
@@ -58,6 +73,12 @@ module.exports = function (io, socket) {
                                     user: "System",
                                     text: "You are connected to " + room.name + " as player 1",
                                     timestamp: Date()
+                                });
+                                io.to(room.name).emit("game:updateBoard", {
+                                    board: room.board,
+                                    hands: {
+                                        player1: cardResult
+                                    }
                                 });
                             }
                         });

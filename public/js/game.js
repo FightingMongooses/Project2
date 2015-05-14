@@ -29,10 +29,10 @@ var game = {
         },
         load: function (player, cards) { // Load each players cards
             for (var i = 0; i < cards.length; i++) {
-                $("<div>" + cards[i].title + "</div>")
+                $("<div><img src=\"" + cards[i].picture + "\"></div>")
                     .data("number", cards[i])
                     .attr("id", "player" + player.toString())
-                    .appendTo("#cardPile1").draggable({
+                    .appendTo("#cardPile" + player.toString()).draggable({
                         containment: "#content",
                         stack: "#cardPile" + player.toString() + " div",
                         cursor: "move",
