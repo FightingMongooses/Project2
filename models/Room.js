@@ -22,23 +22,23 @@ module.exports = function (mongoose) {
     Room.pre("save",function(next){
         var player1score = 0;
         var player2score = 0;
-        /*
-        this.board.owner.forEach(function(owner){
-                if (owner === this.player1) {
+        var entry = this;
+        entry.board.owner.forEach(function(owner){
+                if (owner === entry.player1) {
                     player1score += 1;
-                } else if (owner === this.player2) {
+                } else if (owner === entry.player2) {
                     player2score += 1;
                 }
                 if (player1score + player2score === 9) {
                     if (player1score > player2score) {
-                        this.winner = this.player1;
+                        entry.winner = entry.player1;
                     } else {
-                        this.winner = this.player2;
+                        entry.winner = entry.player2;
                     }
-                    console.log("WINNER: " + this.winner);
+                    entry.state = "complete";
+                    console.log("WINNER: " + entry.winner);
                 }
         });
-        */
         next();
     });
 

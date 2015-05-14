@@ -189,10 +189,10 @@ module.exports = function (io, socket) {
                 socket.emit("chat:receive", {
                     chat: "global",
                     user: "System",
-                    text: "User "+entry.displayname+" has changed their name to "+msg.displayname+".",
+                    text: "User " + entry.displayname + " has changed their name to " + msg.displayname + ".",
                     timestamp: Date()
                 });
-                entry.displayname=msg.displayname;
+                entry.displayname = msg.displayname;
                 entry.markModified("displayname");
                 entry.save();
                 var token = tokenGenerator(entry._id, entry.email, socket.id, entry.displayname);

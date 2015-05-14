@@ -1,6 +1,6 @@
 "use strict";
 var game = {
-    current : null,
+    current: null,
     info: {
         players: null
     },
@@ -11,17 +11,14 @@ var game = {
         },
         load: function (board) { // Load current state of game
             for (var i = 0; i < 9; i++) {
-                if(board[i] === undefined) {
+                if (board.card[i] !== null && board.card[i].title !== "Placeholder") {
+                    console.log({card: board.card[i]});
                     $("<div></div>")
-                        .data("number", i)
+                        .data("number", i).css("background-image", "url(" + board.card[i].picture + ")")
                         .appendTo("#cardSlots")
-                        .droppable({
-                            accept: "#cardPile1 div, #cardPile2 div",
-                            hoverClass: "hovered",
-                            drop: handleCardDrop
-                        });
+                        .droppable();
                 } else {
-                    $("<div>" + board[i] + "</div>")
+                    $("<div></div>")
                         .data("number", i)
                         .appendTo("#cardSlots")
                         .droppable({
@@ -32,7 +29,7 @@ var game = {
                 }
             }
         },
-        play: function(position,card){
+        play: function (position, card) {
             socket.emit("game:placeCard", {card: card, position: position, current: game.current});
         }
     },
@@ -42,22 +39,24 @@ var game = {
             $("#cardPile2").html("");
         },
         load: function (player, cards) { // Load each players cards
-            for (var i = 0; i < cards.length; i++) {
-                var config = {
-                    containment: "#gameBoard",
-                    stack: "#cardPile" + player.toString() + " div",
-                    cursor: "move",
-                    revert: true
-                };
-                if(game.info.players.player1 === user.info.displayname && player !== 1) {
-                    config.disabled = true;
-                } else if(game.info.players.player2 === user.info.displayname && player !== 2){
-                    config.disabled = true;
+            if (typeof cards !== "undefined") {
+                for (var i = 0; i < cards.length; i++) {
+                    var config = {
+                        containment: "#gameBoard",
+                        stack: "#cardPile" + player.toString() + " div",
+                        cursor: "move",
+                        revert: true
+                    };
+                    if (game.info.players.player1 === user.info.displayname && player !== 1) {
+                        config.disabled = true;
+                    } else if (game.info.players.player2 === user.info.displayname && player !== 2) {
+                        config.disabled = true;
+                    }
+                    $("<div></div>")
+                        .data("number", cards[i]).css("background-image", "url(" + cards[i].picture + ")")
+                        .attr("id", "player" + player.toString())
+                        .appendTo("#cardPile" + player.toString()).draggable(config);
                 }
-                $("<div><img src=\"" + cards[i].picture + "\"></div>")
-                    .data("number", cards[i])
-                    .attr("id", "player" + player.toString())
-                    .appendTo("#cardPile" + player.toString()).draggable(config);
             }
         }
     },
@@ -78,25 +77,24 @@ var game = {
         $("a#gameJoin").click(function (event) {
             event.preventDefault();
             socket.emit("game:connect", {token: user.info.token});
-            $("a#gameJoin").parent().addClass("hidden");
-            game.board.wipe();
-            game.cards.wipe();
+//            game.board.wipe();
+//            game.cards.wipe();
         });
         // Socket event capturing
         socket.on("game:updateBoard", function (data) { // Revise board
             console.log({updateBoard: data});
+            $("a#gameJoin").parent().addClass("hidden");
             game.info.players = data.players;
+//            console.log({game:game.info.players,data:data.players});
             //TODO
             game.cards.wipe();
             game.board.wipe();
             game.cards.load(1, data.hands.player1);
             game.cards.load(2, data.hands.player2);
             game.board.load(data.board);
-            // OLD
-            var posi = "#pos" + pos;
-            var img = "img" + pos;
-            console.log(data + " : " + posi);
-            $(posi).html("<img src=" + data + ">");
+        });
+        socket.on("game:complete",function(data){
+
         });
     }
 };
@@ -104,7 +102,7 @@ function handleCardDrop(event, ui) {
     var position = $(this).data("number");
     var cardData = ui.draggable.data("number");
 
-    game.board.play(position,cardData);
+    game.board.play(position, cardData);
     // If the card was dropped to the correct slot,
     // change the card colour, position it directly
     // on top of the slot, and prevent it being dragged
